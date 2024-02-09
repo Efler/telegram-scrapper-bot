@@ -28,7 +28,7 @@
         <Logger name="sun.rmi" level="WARN"/>
         <Logger name="sun.rmi.transport" level="WARN"/>
 
-        <Logger name="edu.java" level="TRACE"/>
+        <Logger name="edu.eflerrr" level="TRACE"/>
 
         <Root level="INFO">
             <AppenderRef ref="STDOUT_PLAIN"/>

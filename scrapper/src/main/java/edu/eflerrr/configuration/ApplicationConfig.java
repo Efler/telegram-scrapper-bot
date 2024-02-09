@@ -1,4 +1,4 @@
-package edu.java.configuration;
+package edu.eflerrr.configuration;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;

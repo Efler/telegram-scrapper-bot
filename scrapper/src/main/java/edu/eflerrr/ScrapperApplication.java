@@ -1,6 +1,6 @@
-package edu.java;
+package edu.eflerrr;
 
-import edu.java.configuration.ApplicationConfig;
+import edu.eflerrr.configuration.ApplicationConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

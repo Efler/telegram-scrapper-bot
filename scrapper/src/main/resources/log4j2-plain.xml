@@ -35,7 +35,7 @@
 <!--        <Logger name="org.hibernate.SQL_SLOW" level="info"/>-->
 <!--        <Logger name="org.hibernate.cache" level="debug"/>-->
 
-        <Logger name="edu.java" level="TRACE"/>
+        <Logger name="edu.eflerrr" level="TRACE"/>
 
         <Root level="INFO">
             <AppenderRef ref="STDOUT_PLAIN"/>
