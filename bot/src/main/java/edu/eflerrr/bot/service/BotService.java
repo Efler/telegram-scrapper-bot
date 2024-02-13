@@ -3,6 +3,7 @@ package edu.eflerrr.bot.service;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.BotCommand;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SetMyCommands;
@@ -28,44 +29,49 @@ public class BotService {
         this.commandHandlers = handlerList.getCommands();
     }
 
-    public void setCommandsMenu(TelegramBot bot) {
-        SetMyCommands menuRequest = new SetMyCommands(
-            commandHandlers.stream()
+    public SetMyCommands createMenu(List<CommandHandler> handlers) {
+        return new SetMyCommands(
+            handlers.stream()
                 .map((c) -> new BotCommand(c.getCommandName(), c.getCommandDescription()))
-                .toArray(BotCommand[]::new));
-        BaseResponse menuResponse = bot.execute(menuRequest);
-        if (menuResponse.isOk()) {
-            log.info("Menu Successfully installed!");
+                .toArray(BotCommand[]::new)
+        );
+    }
+
+    public SendMessage handleUpdate(Update update) {
+        CommandHandler handler = null;
+        for (var h : commandHandlers) {
+            if (h.checkFormat(update.message().text())) {
+                handler = h;
+            }
+        }
+        if (handler != null) {
+            String botAnswer = handler.handle(update);
+            return new SendMessage(
+                update.message().chat().id(),
+                botAnswer
+            )
+                .parseMode(ParseMode.MarkdownV2)
+                .disableWebPagePreview(true);
         } else {
-            log.warn("Menu installation failed! Response description: " + menuResponse.description());
+            return new SendMessage(
+                update.message().chat().id(),
+                "Прости, не могу распознать эту команду!"
+            );
         }
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void startBot() {
-        setCommandsMenu(bot);
+        BaseResponse menuResponse = bot.execute(createMenu(commandHandlers));
+        if (menuResponse.isOk()) {
+            log.info("Menu Successfully installed!");
+        } else {
+            log.warn("Menu installation failed! Response description: " + menuResponse.description());
+        }
+
         bot.setUpdatesListener(updates -> {
             for (var update : updates) {
-                CommandHandler handler = null;
-                for (var h : commandHandlers) {
-                    if (h.checkFormat(update.message().text())) {
-                        handler = h;
-                    }
-                }
-                if (handler != null) {
-                    String botAnswer = handler.handle(update);
-                    bot.execute(new SendMessage(
-                        update.message().chat().id(),
-                        botAnswer
-                    )
-                        .parseMode(ParseMode.MarkdownV2)
-                        .disableWebPagePreview(true));
-                } else {
-                    bot.execute(new SendMessage(
-                        update.message().chat().id(),
-                        "Прости, не могу распознать эту команду!"
-                    ));
-                }
+                bot.execute(handleUpdate(update));
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, ex -> {
