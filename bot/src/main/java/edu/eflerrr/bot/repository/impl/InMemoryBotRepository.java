@@ -28,7 +28,7 @@ public class InMemoryBotRepository implements BotRepository {
         if (!memory.containsKey(chatId)) {
             throw new IllegalArgumentException(userNotFoundMessage);
         }
-        var trackingUrls = memory.get(chatId);
+        var trackingUrls = new ArrayList<>(memory.get(chatId));
         if (trackingUrls.contains(url)) {
             return false;
         }
@@ -46,7 +46,7 @@ public class InMemoryBotRepository implements BotRepository {
         if (!memory.containsKey(chatId)) {
             throw new IllegalArgumentException(userNotFoundMessage);
         }
-        var trackingUrls = memory.get(chatId);
+        var trackingUrls = new ArrayList<>(memory.get(chatId));
         if (!trackingUrls.contains(url)) {
             return false;
         }
