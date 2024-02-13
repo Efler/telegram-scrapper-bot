@@ -28,13 +28,12 @@ import static org.mockito.Mockito.when;
 
 class TrackCommandHandlerTest {
     private final Map<Long, List<URL>> memory;
-    private final ApplicationConfig config;
     private final TrackCommandHandler trackCommandHandler;
 
     public TrackCommandHandlerTest() {
         this.memory = new HashMap<>();
         BotRepository repository = new InMemoryBotRepository(memory);
-        this.config = mock(ApplicationConfig.class);
+        ApplicationConfig config = mock(ApplicationConfig.class);
         when(config.availableSites()).thenReturn(List.of(
             "github.com",
             "stackoverflow.com",
