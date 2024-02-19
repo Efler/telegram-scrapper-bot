@@ -60,7 +60,7 @@ public class BotService {
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+//    @EventListener(ApplicationReadyEvent.class)
     public void startBot() {
         BaseResponse menuResponse = bot.execute(createMenu(commandHandlers));
         if (menuResponse.isOk()) {
