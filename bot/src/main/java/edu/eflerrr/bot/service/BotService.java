@@ -13,8 +13,8 @@ import edu.eflerrr.bot.command.list.CommandHandlerList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.context.event.ApplicationReadyEvent; TODO!
-//import org.springframework.context.event.EventListener;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -60,7 +60,7 @@ public class BotService {
         }
     }
 
-//    @EventListener(ApplicationReadyEvent.class) TODO!
+    @EventListener(ApplicationReadyEvent.class)
     public void startBot() {
         BaseResponse menuResponse = bot.execute(createMenu(commandHandlers));
         if (menuResponse.isOk()) {
