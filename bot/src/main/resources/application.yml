@@ -1,5 +1,5 @@
 app:
-  telegram-token: ${token}
+  telegram-token: ${TOKEN}
   available-sites:
     - github.com
     - stackoverflow.com

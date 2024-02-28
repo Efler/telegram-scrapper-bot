@@ -4,20 +4,16 @@ import com.pengrad.telegrambot.model.Update;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.command.list.CommandHandlerList;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class HelpCommandHandler implements CommandHandler {
     private final String name = "/help";
     private final String description = "Вывести окно с командами";
     private final ApplicationContext context;
-
-    @Autowired
-    public HelpCommandHandler(ApplicationContext context) {
-        this.context = context;
-    }
 
     @Override
     public String getCommandName() {
