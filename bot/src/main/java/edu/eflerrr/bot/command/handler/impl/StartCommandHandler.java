@@ -1,21 +1,24 @@
 package edu.eflerrr.bot.command.handler.impl;
 
 import com.pengrad.telegrambot.model.Update;
-import edu.eflerrr.bot.client.ScrapperClient;
 import edu.eflerrr.bot.command.handler.CommandHandler;
-import edu.eflerrr.bot.exception.DuplicateRegistrationException;
-import lombok.RequiredArgsConstructor;
+import edu.eflerrr.bot.repository.BotRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import static edu.eflerrr.bot.message.BotMessage.GREETING;
-import static edu.eflerrr.bot.message.BotMessage.WELCOME_EXISTING_USER;
-import static edu.eflerrr.bot.message.BotMessage.WELCOME_NEW_USER;
+import static edu.eflerrr.bot.command.message.BotMessage.GREETING;
+import static edu.eflerrr.bot.command.message.BotMessage.WELCOME_EXISTING_USER;
+import static edu.eflerrr.bot.command.message.BotMessage.WELCOME_NEW_USER;
 
 @Component
-@RequiredArgsConstructor
 public class StartCommandHandler implements CommandHandler {
     private final String name = "/start";
     private final String description = "Зарегистрировать пользователя";
-    private final ScrapperClient scrapperClient;
+    private final BotRepository repository;
+
+    @Autowired
+    public StartCommandHandler(BotRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public String getCommandName() {
@@ -39,10 +42,9 @@ public class StartCommandHandler implements CommandHandler {
         }
         String username = update.message().chat().username();
         Long chatId = update.message().chat().id();
-        try {
-            scrapperClient.registerTgChat(chatId);
+        if (repository.addUser(chatId)) {
             return String.format(GREETING, username) + WELCOME_NEW_USER;
-        } catch (DuplicateRegistrationException ex) {
+        } else {
             return String.format(GREETING, username) + WELCOME_EXISTING_USER;
         }
     }
