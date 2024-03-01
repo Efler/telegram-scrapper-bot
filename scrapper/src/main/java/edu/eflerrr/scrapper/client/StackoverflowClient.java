@@ -1,12 +1,11 @@
-package edu.eflerrr.client.impl;
+package edu.eflerrr.scrapper.client;
 
-import edu.eflerrr.client.HttpClient;
-import edu.eflerrr.client.response.impl.StackoverflowClientResponse;
+import edu.eflerrr.scrapper.client.dto.response.StackoverflowClientResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-public class StackoverflowClient implements HttpClient {
+public class StackoverflowClient {
     private final WebClient webClient;
     public final String defaultApiUrl = "https://api.stackexchange.com";
 
@@ -17,7 +16,6 @@ public class StackoverflowClient implements HttpClient {
         this.webClient = WebClient.create(apiUrl);
     }
 
-    @Override
     public StackoverflowClientResponse fetchResponse(String question) {
         var stackoverflowResponse = webClient.get()
             .uri(String.format(
