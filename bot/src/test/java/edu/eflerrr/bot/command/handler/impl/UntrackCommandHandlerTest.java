@@ -163,7 +163,7 @@ class UntrackCommandHandlerTest {
 
             String actualAnswer = untrackCommandHandler.handle(emptyLinkUpdate);
 
-            String expectedAnswer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\! "
+            String expectedAnswer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\!\n"
                 + "Напишите её через ___пробел_\r__ после команды /untrack\\!";
             assertThat(actualAnswer)
                 .isEqualTo(expectedAnswer);

@@ -187,7 +187,7 @@ class TrackCommandHandlerTest {
 
             String actualAnswer = trackCommandHandler.handle(emptyLinkUpdate);
 
-            String expectedAnswer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\! "
+            String expectedAnswer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\!\n"
                 + "Напишите её через ___пробел_\r__ после команды /track\\!";
             assertThat(actualAnswer)
                 .isEqualTo(expectedAnswer);

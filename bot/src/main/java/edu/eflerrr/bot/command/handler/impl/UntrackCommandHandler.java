@@ -9,6 +9,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static edu.eflerrr.bot.command.message.BotMessage.UNTRACK_COMMAND_FORMAT_ERROR;
+import static edu.eflerrr.bot.command.message.BotMessage.UNTRACK_COMMAND_SUCCESS;
+import static edu.eflerrr.bot.command.message.BotMessage.UNTRACK_COMMAND_URL_NOT_FOUND;
+import static edu.eflerrr.bot.command.message.BotMessage.URL_ERROR;
+import static edu.eflerrr.bot.command.message.BotMessage.USER_NOT_FOUND_ERROR;
 
 @Component
 public class UntrackCommandHandler implements CommandHandler {
@@ -44,25 +49,23 @@ public class UntrackCommandHandler implements CommandHandler {
             throw new IllegalArgumentException("Invalid command format!");
         }
         if (command.length() <= name.length() + 1) {
-            answer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\! "
-                + "Напишите её через ___пробел_\r__ после команды /untrack\\!";
+            answer = UNTRACK_COMMAND_FORMAT_ERROR;
         } else {
             URL url;
             try {
                 url = new URI(command.substring(name.length() + 1)).toURL();
             } catch (IllegalArgumentException | MalformedURLException | URISyntaxException ex) {
-                return "Ой, вы передали ___некорректную_\r__ ссылку\\!";
+                return URL_ERROR;
             }
             var chatId = update.message().chat().id();
             try {
                 if (repository.untrackLink(chatId, url)) {
-                    answer = "Ссылка ___успешно_\r__ удалена\\!";
+                    answer = UNTRACK_COMMAND_SUCCESS;
                 } else {
-                    answer = "Не переживай, в твоем списке такой ссылки и так ___не было_\r__ :\\)";
+                    answer = UNTRACK_COMMAND_URL_NOT_FOUND;
                 }
             } catch (IllegalArgumentException e) {
-                return "Прости, не могу найти тебя в ___базе данных_\r__\\! "
-                    + "Попробуйте начать с команды /start";
+                return USER_NOT_FOUND_ERROR;
             }
         }
         return answer;
