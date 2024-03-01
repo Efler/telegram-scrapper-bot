@@ -1,9 +1,9 @@
-package edu.eflerrr.client.impl;
+package edu.eflerrr.scrapper.client;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
-import edu.eflerrr.ScrapperApplication;
-import edu.eflerrr.client.response.impl.StackoverflowClientResponse;
+import edu.eflerrr.scrapper.ScrapperApplication;
+import edu.eflerrr.scrapper.client.dto.response.StackoverflowClientResponse;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
