@@ -1,12 +1,11 @@
-package edu.eflerrr.client.impl;
+package edu.eflerrr.scrapper.client;
 
-import edu.eflerrr.client.HttpClient;
-import edu.eflerrr.client.response.impl.GithubClientResponse;
+import edu.eflerrr.scrapper.client.dto.response.GithubClientResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-public class GithubClient implements HttpClient {
+public class GithubClient {
     private final WebClient webClient;
     public final String defaultApiUrl = "https://api.github.com";
 
@@ -17,7 +16,6 @@ public class GithubClient implements HttpClient {
         this.webClient = WebClient.create(apiUrl);
     }
 
-    @Override
     public GithubClientResponse fetchResponse(String repository) {
         var githubResponse = webClient.get()
             .uri(String.format("/repos%s", repository))

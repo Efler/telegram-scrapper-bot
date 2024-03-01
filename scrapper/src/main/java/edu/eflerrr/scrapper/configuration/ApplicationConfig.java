@@ -1,4 +1,4 @@
-package edu.eflerrr.configuration;
+package edu.eflerrr.scrapper.configuration;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
@@ -17,7 +17,8 @@ public record ApplicationConfig(
 ) {
     public record Api(
         String githubBaseUrl,
-        String stackoverflowBaseUrl
+        String stackoverflowBaseUrl,
+        String botBaseUrl
     ) {
     }
 
