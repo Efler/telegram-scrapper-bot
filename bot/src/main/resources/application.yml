@@ -1,0 +1,23 @@
+app:
+  telegram-token: ${token}
+  available-sites:
+    - github.com
+    - stackoverflow.com
+  api:
+    scrapper-base-url: localhost:8080
+
+spring:
+  application:
+    name: bot
+  jackson:
+    time-zone: UTC
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
+server:
+  port: 8090
+
+logging:
+  config: classpath:log4j2-plain.xml
