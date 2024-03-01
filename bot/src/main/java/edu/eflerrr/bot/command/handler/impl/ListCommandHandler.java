@@ -7,6 +7,9 @@ import java.net.URL;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static edu.eflerrr.bot.command.message.BotMessage.LIST_COMMAND_EMPTY_LIST_ERROR;
+import static edu.eflerrr.bot.command.message.BotMessage.LIST_COMMAND_SUCCESS_HEADER;
+import static edu.eflerrr.bot.command.message.BotMessage.USER_NOT_FOUND_ERROR;
 
 @Component
 public class ListCommandHandler implements CommandHandler {
@@ -68,13 +71,13 @@ public class ListCommandHandler implements CommandHandler {
         try {
             List<URL> urls = repository.listLink(chatId);
             if (urls.isEmpty()) {
-                return "Упс, похоже, что у тебя ___нет_\r__ отслеживаемых ссылок\\!";
+                return LIST_COMMAND_EMPTY_LIST_ERROR;
             } else {
                 var stringUrls = urlsToMarkdown(urls);
-                return "*Твои отслеживаемые ссылки:*\n\n" + String.join("\n", stringUrls);
+                return LIST_COMMAND_SUCCESS_HEADER + String.join("\n", stringUrls);
             }
         } catch (IllegalArgumentException e) {
-            return "Прости, не могу найти тебя в ___базе данных_\r__\\! Попробуйте начать с команды /start";
+            return USER_NOT_FOUND_ERROR;
         }
     }
 }

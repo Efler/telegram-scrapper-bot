@@ -81,7 +81,7 @@ class HelpCommandHandlerTest {
 
             var actualAnswer = helpCommandHandler.handle(update);
 
-            var expectedAnswer = "*Список команд пустой!*";
+            var expectedAnswer = "*Список команд пустой\\!*";
             assertThat(actualAnswer)
                 .isEqualTo(expectedAnswer);
         }

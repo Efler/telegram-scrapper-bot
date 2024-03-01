@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import static edu.eflerrr.bot.command.message.BotMessage.HELP_COMMAND_EMPTY_LIST_ERROR;
+import static edu.eflerrr.bot.command.message.BotMessage.HELP_COMMAND_SUCCESS_HEADER;
 
 @Component
 @RequiredArgsConstructor
@@ -37,9 +39,9 @@ public class HelpCommandHandler implements CommandHandler {
         }
         var commandHandlers = context.getBean(CommandHandlerList.class).getCommands();
         if (commandHandlers.isEmpty()) {
-            return "*Список команд пустой!*";
+            return HELP_COMMAND_EMPTY_LIST_ERROR;
         } else {
-            return "*Список команд:*\n\n" + commandHandlers.stream()
+            return HELP_COMMAND_SUCCESS_HEADER + commandHandlers.stream()
                 .map((h) -> String.format("*%s* \\-\\> _%s_", h.getCommandName(), h.getCommandDescription()))
                 .collect(Collectors.joining("\n"));
         }
