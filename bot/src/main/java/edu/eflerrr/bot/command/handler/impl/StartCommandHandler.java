@@ -5,6 +5,9 @@ import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.repository.BotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static edu.eflerrr.bot.command.message.BotMessage.GREETING;
+import static edu.eflerrr.bot.command.message.BotMessage.WELCOME_EXISTING_USER;
+import static edu.eflerrr.bot.command.message.BotMessage.WELCOME_NEW_USER;
 
 @Component
 public class StartCommandHandler implements CommandHandler {
@@ -39,20 +42,10 @@ public class StartCommandHandler implements CommandHandler {
         }
         String username = update.message().chat().username();
         Long chatId = update.message().chat().id();
-        String welcomeMessage = String.format(
-            "Привет, *%s*\\!\n\n"
-                + "Я бот для ___отслеживания обновлений_\r__ множества веб\\-ресурсов, которые тебе интересны\\! "
-                + "Для получения списка доступных команд открой ___меню_\r__ или введи /help\\.\n\n",
-            username
-        );
         if (repository.addUser(chatId)) {
-            return welcomeMessage
-                + "Ты ___успешно_\r__ зарегистрирован\\! "
-                + "Можешь начинать отслеживать ссылки\\!";
+            return String.format(GREETING, username) + WELCOME_NEW_USER;
         } else {
-            return welcomeMessage
-                + "Ты ___уже_\r__ регистрировался, твой список отслеживаемых ссылок ___сохранен_\r__\\! "
-                + "Можешь приступать\\!";
+            return String.format(GREETING, username) + WELCOME_EXISTING_USER;
         }
     }
 }
