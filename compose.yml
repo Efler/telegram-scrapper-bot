@@ -7,13 +7,28 @@ services:
       POSTGRES_DB: scrapper
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+#    volumes:
+#      - postgresql:/var/lib/postgresql/data
+    networks:
+      - backend
+  liquibase-migrations:
+    image: liquibase/liquibase:4.25
+    depends_on:
+      - postgresql
+    command:
+      - --changelog-file=changelog-master.xml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgresql:5432/scrapper
+      - --username=postgres
+      - --password=postgres
+      - update
     volumes:
-      - postgresql:/var/lib/postgresql/data
+      - ./migrations:/liquibase/changelog
     networks:
       - backend
 
-volumes:
-  postgresql: { }
+#volumes:
+#  postgresql: { }
 
 networks:
   backend: { }
