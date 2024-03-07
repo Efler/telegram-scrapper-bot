@@ -11,6 +11,8 @@ app:
 spring:
   application:
     name: scrapper
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 springdoc:
   swagger-ui:
