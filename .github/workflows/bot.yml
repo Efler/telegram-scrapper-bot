@@ -17,6 +17,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TELEGRAM_SCRAPPER_BOT_ACCESS_TOKEN }}
       - uses: actions/setup-java@v4
         with:
           java-version: '21'
