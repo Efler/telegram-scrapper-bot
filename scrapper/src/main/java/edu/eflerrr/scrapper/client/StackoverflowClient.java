@@ -1,19 +1,21 @@
 package edu.eflerrr.scrapper.client;
 
+import edu.eflerrr.scrapper.client.customizer.StackoverflowWebClientCustomizer;
 import edu.eflerrr.scrapper.client.dto.response.StackoverflowClientResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+@Component
 public class StackoverflowClient {
     private final WebClient webClient;
-    public final String defaultApiUrl = "https://api.stackexchange.com";
 
-    public StackoverflowClient(String baseApiUrl) {
-        var apiUrl = baseApiUrl == null || baseApiUrl.isEmpty()
-            ? defaultApiUrl
-            : baseApiUrl;
-        this.webClient = WebClient.create(apiUrl);
+    @Autowired
+    public StackoverflowClient(WebClient.Builder webClientBuilder, StackoverflowWebClientCustomizer customizer) {
+        customizer.customize(webClientBuilder);
+        this.webClient = webClientBuilder.build();
     }
 
     public StackoverflowClientResponse fetchResponse(String question) {
