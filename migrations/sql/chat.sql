@@ -9,5 +9,4 @@ CREATE TABLE Chat
     PRIMARY KEY (id)
 );
 
--- rollback init_chat_table
-DROP TABLE Chat;
+-- rollback DROP TABLE Chat;
