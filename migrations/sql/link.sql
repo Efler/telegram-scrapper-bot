@@ -9,5 +9,4 @@ CREATE TABLE Link
     checked_at timestamp with time zone NOT NULL
 );
 
--- rollback init_link_table
-DROP TABLE Link;
+-- rollback DROP TABLE Link;
