@@ -5,5 +5,9 @@ CREATE TABLE Link
 (
     id         bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     url        text                     NOT NULL UNIQUE,
-    created_at timestamp with time zone NOT NULL
+    created_at timestamp with time zone NOT NULL,
+    checked_at timestamp with time zone NOT NULL
 );
+
+-- rollback init_link_table
+DROP TABLE Link;
