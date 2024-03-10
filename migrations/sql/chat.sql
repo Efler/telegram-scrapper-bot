@@ -8,3 +8,6 @@ CREATE TABLE Chat
     created_at timestamp with time zone NOT NULL,
     PRIMARY KEY (id)
 );
+
+-- rollback init_chat_table
+DROP TABLE Chat;
