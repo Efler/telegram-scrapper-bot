@@ -9,3 +9,6 @@ CREATE TABLE Tracking
     FOREIGN KEY (chat_id) REFERENCES Chat (id),
     FOREIGN KEY (link_id) REFERENCES Link (id)
 );
+
+-- rollback init_tracking_table
+DROP TABLE Tracking;
