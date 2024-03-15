@@ -85,7 +85,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(jsonResponseBody)));
 
-        var actualResponse = stackoverflowClient.fetchResponse("/777777");
+        var actualResponse = stackoverflowClient.fetchResponse(777777L);
 
         StackoverflowClientResponse expectedResponse = new StackoverflowClientResponse(
             OffsetDateTime.parse("2024-02-23T14:10:31Z"),
@@ -112,7 +112,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody("{\"message\": \"Not Found\"}")));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/4435432"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(4435432L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Client error during fetchResponse in StackoverflowClient! Message: 404 Not Found"
@@ -129,7 +129,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody("{\"message\": \"Im feeling not good\"}")));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/111111"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(111111L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Server error during fetchResponse in StackoverflowClient! Message: 502 Bad Gateway"
@@ -146,7 +146,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody("{\"message\": \"Welcome!\"}")));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/222222"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(222222L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Unexpected status code during fetchResponse in StackoverflowClient! Message: 305 Use Proxy"
@@ -169,7 +169,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(jsonResponseBody)));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/5555222"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(5555222L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Error occurred during fetchResponse in StackoverflowClient! Message: empty response/data"
@@ -193,7 +193,7 @@ class StackoverflowClientTest {
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(jsonResponseBody)));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/333333"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(333333L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Error occurred during fetchResponse in StackoverflowClient! Message: empty response/data"
@@ -239,14 +239,14 @@ class StackoverflowClientTest {
               "quota_remaining": 299.0
             }""";
         wireMock.stubFor(get(urlEqualTo(
-            "/questions/098098/timeline?order=desc&sort=creation_date&site=stackoverflow")
+            "/questions/1098098/timeline?order=desc&sort=creation_date&site=stackoverflow")
         )
             .willReturn(aResponse()
                 .withStatus(200)
                 .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                 .withBody(jsonResponseBody)));
 
-        assertThatThrownBy(() -> stackoverflowClient.fetchResponse("/098098"))
+        assertThatThrownBy(() -> stackoverflowClient.fetchResponse(1098098L))
             .isInstanceOf(RuntimeException.class)
             .hasMessage(
                 "Error occurred during fetchResponse in StackoverflowClient! Message: empty response/data"
