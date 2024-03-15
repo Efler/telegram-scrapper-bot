@@ -10,12 +10,12 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import static edu.eflerrr.bot.command.message.BotMessage.SITE_ERROR;
-import static edu.eflerrr.bot.command.message.BotMessage.TRACK_COMMAND_EXISTING_URL;
-import static edu.eflerrr.bot.command.message.BotMessage.TRACK_COMMAND_FORMAT_ERROR;
-import static edu.eflerrr.bot.command.message.BotMessage.TRACK_COMMAND_SUCCESS;
-import static edu.eflerrr.bot.command.message.BotMessage.URL_ERROR;
-import static edu.eflerrr.bot.command.message.BotMessage.USER_NOT_FOUND_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.SITE_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.TRACK_COMMAND_EXISTING_URL;
+import static edu.eflerrr.bot.message.BotMessage.TRACK_COMMAND_FORMAT_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.TRACK_COMMAND_SUCCESS;
+import static edu.eflerrr.bot.message.BotMessage.URL_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.USER_NOT_FOUND_ERROR;
 
 @Component
 public class TrackCommandHandler implements CommandHandler {
