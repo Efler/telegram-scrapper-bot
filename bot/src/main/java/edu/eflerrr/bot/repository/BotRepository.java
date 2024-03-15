@@ -3,6 +3,8 @@ package edu.eflerrr.bot.repository;
 import java.net.URL;
 import java.util.List;
 
+// TODO: DELETE!
+
 public interface BotRepository {
     boolean trackLink(Long chatId, URL url);
 
