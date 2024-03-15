@@ -13,5 +13,6 @@
     <include file="sql/chat.sql"/>
     <include file="sql/link.sql"/>
     <include file="sql/tracking.sql"/>
+    <include file="sql/branch.sql"/>
 
 </databaseChangeLog>
