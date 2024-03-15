@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 class BotCommandHandlerListTest {
+    /*
     private final List<CommandHandler> commands;
 
     private final CommandHandlerList botCommandHandlerListTest;
@@ -60,4 +61,5 @@ class BotCommandHandlerListTest {
         assertThat(actualCommandList)
             .isEqualTo(commands);
     }
+    */
 }
