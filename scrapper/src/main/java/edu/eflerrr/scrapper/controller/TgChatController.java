@@ -1,12 +1,14 @@
 package edu.eflerrr.scrapper.controller;
 
 import edu.eflerrr.scrapper.controller.dto.response.ApiErrorResponse;
+import edu.eflerrr.scrapper.service.TgChatService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +20,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 @Tag(name = "tg-chat", description = "the tg-chat API")
 @RestController
+@RequiredArgsConstructor
 public class TgChatController {
+
+    private final TgChatService tgChatService;
 
     /**
      * DELETE /tg-chat/{id} : Удалить чат
@@ -51,7 +56,8 @@ public class TgChatController {
         @PathVariable("id")
         Long id
     ) {
-        return ResponseEntity.ok().build();     // TODO: stub!
+        tgChatService.unregister(id);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -84,7 +90,8 @@ public class TgChatController {
         @PathVariable("id")
         Long id
     ) {
-        return ResponseEntity.ok().build();     // TODO: stub!
+        tgChatService.register(id);
+        return ResponseEntity.ok().build();
     }
 
 }
