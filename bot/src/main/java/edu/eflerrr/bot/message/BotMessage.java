@@ -1,4 +1,4 @@
-package edu.eflerrr.bot.command.message;
+package edu.eflerrr.bot.message;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -66,4 +66,8 @@ public class BotMessage {
 
     public static final String HELP_COMMAND_SUCCESS_HEADER =
         "*Список команд:*\n\n";
+
+    public static final String UNKNOWN_COMMAND_ERROR =
+        "Прости, но я ___не знаю_\r__ такой команды\\! "
+            + "Попробуйте начать с команды /help";
 }
