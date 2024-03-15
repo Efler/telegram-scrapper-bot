@@ -4,10 +4,20 @@ import edu.eflerrr.bot.client.dto.request.LinkRequest;
 import edu.eflerrr.bot.client.dto.response.LinkResponse;
 import edu.eflerrr.bot.client.dto.response.ListLinksResponse;
 import edu.eflerrr.bot.client.dto.response.ScrapperErrorResponse;
+import edu.eflerrr.bot.exception.DuplicateRegistrationException;
+import edu.eflerrr.bot.exception.InvalidDataException;
 import java.net.URI;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+
+// TODO! доделать исключения в clients
+// TODO! допилить коммуникацию между сервисами
+// TODO! починить тесты
+// TODO! возможно стоит добавить логирование
+// TODO! возможно стоит добавить валидацию ссылок
 
 @SuppressWarnings("MemberName")
 public class ScrapperClient {
@@ -35,6 +45,12 @@ public class ScrapperClient {
             })
             .block();
         if (botResponse != null) {
+            if (Integer.parseInt(botResponse.code()) == CONFLICT.value()) {
+                throw new DuplicateRegistrationException(botResponse.description());
+            }
+            if (Integer.parseInt(botResponse.code()) == BAD_REQUEST.value()) {
+                throw new InvalidDataException(botResponse.description());
+            }
             throw new RuntimeException(
                 "Error occurred during registerTgChat in ScrapperClient! ErrorResponse: " + botResponse
             );
