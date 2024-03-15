@@ -14,10 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
 @DirtiesContext
-class SimpleIntegrationTest extends IntegrationTest {
+class MigrationTest extends IntegrationTest {
 
     @Test
-    public void MigrationTest() {
+    public void allTablesInitTest() {
         try (Connection connection = DriverManager.getConnection(
             POSTGRES.getJdbcUrl(),
             POSTGRES.getUsername(),
@@ -35,10 +35,9 @@ class SimpleIntegrationTest extends IntegrationTest {
             }
 
             assertThat(tableNames)
-                .hasSize(5)
+                .hasSize(6)
                 .containsExactlyInAnyOrder(
-                    "chat", "link", "tracking",
-                    "databasechangelog", "databasechangeloglock"
+                    "chat", "link", "tracking", "branch", "databasechangelog", "databasechangeloglock"
                 );
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
