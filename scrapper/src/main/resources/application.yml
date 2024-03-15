@@ -6,13 +6,20 @@ app:
   scheduler:
     enable: true
     interval: 5s
-    force-check-delay: 10s
+    force-check-delay: 15s
+  service:
+    implementation: jdbc
 
 spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scrapper
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
   application:
     name: scrapper
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  liquibase:
+    enabled: false
 
 springdoc:
   swagger-ui:
