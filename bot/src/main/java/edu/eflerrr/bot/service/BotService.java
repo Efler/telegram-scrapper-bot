@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import static edu.eflerrr.bot.message.BotMessage.UNKNOWN_COMMAND_ERROR;
 
 @Service
 @Slf4j
@@ -54,8 +55,7 @@ public class BotService {
                 .disableWebPagePreview(true);
         } else {
             return new SendMessage(
-                update.message().chat().id(),
-                "Прости, не могу распознать эту команду!"
+                update.message().chat().id(), UNKNOWN_COMMAND_ERROR
             );
         }
     }
