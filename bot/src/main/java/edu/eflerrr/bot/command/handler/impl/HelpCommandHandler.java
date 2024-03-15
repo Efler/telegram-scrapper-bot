@@ -7,8 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import static edu.eflerrr.bot.command.message.BotMessage.HELP_COMMAND_EMPTY_LIST_ERROR;
-import static edu.eflerrr.bot.command.message.BotMessage.HELP_COMMAND_SUCCESS_HEADER;
+import static edu.eflerrr.bot.message.BotMessage.HELP_COMMAND_EMPTY_LIST_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.HELP_COMMAND_SUCCESS_HEADER;
 
 @Component
 public class HelpCommandHandler implements CommandHandler {
