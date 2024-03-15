@@ -1,17 +1,17 @@
 package edu.eflerrr.bot.advice;
 
 import edu.eflerrr.bot.controller.dto.response.ApiErrorResponse;
-import edu.eflerrr.bot.exception.InvalidRequestDataException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
 
-    @ExceptionHandler(InvalidRequestDataException.class)      // TODO: stub!
-    public ResponseEntity<ApiErrorResponse> invalidRequestData(InvalidRequestDataException ex) {
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)      // TODO: stub!
+    public ResponseEntity<ApiErrorResponse> invalidRequestData(MethodArgumentTypeMismatchException ex) {
         var response = new ApiErrorResponse()
             .description("Некорректные параметры запроса")
             .code(Integer.toString(BAD_REQUEST.value()))
