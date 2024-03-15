@@ -5,6 +5,7 @@ import edu.eflerrr.scrapper.controller.dto.request.RemoveLinkRequest;
 import edu.eflerrr.scrapper.controller.dto.response.ApiErrorResponse;
 import edu.eflerrr.scrapper.controller.dto.response.LinkResponse;
 import edu.eflerrr.scrapper.controller.dto.response.ListLinksResponse;
+import edu.eflerrr.scrapper.service.LinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,8 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.util.ArrayList;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,7 +27,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Validated
 @Tag(name = "links", description = "the links API")
 @RestController
+@RequiredArgsConstructor
 public class LinksController {
+
+    private final LinkService linkService;
 
     /**
      * DELETE /links : Убрать отслеживание ссылки
@@ -67,10 +71,12 @@ public class LinksController {
         @RequestBody
         RemoveLinkRequest removeLinkRequest
     ) {
+        var deletedLink = linkService.delete(tgChatId, removeLinkRequest.getLink());
         return ResponseEntity.ok().body(
             new LinkResponse()
-                .id(tgChatId)
-                .url(removeLinkRequest.getLink()));     // TODO: stub!
+                .id(deletedLink.getId())
+                .url(deletedLink.getUrl())
+        );
     }
 
     /**
@@ -105,20 +111,23 @@ public class LinksController {
         @Parameter(name = "Tg-Chat-Id", description = "id Telegram чата", required = true)
         @RequestHeader(value = "Tg-Chat-Id", required = true)
         Long tgChatId
-    ) throws URISyntaxException {
-        return ResponseEntity.ok().body(
-            new ListLinksResponse()
-                .addLinksItem(
+    ) {
+        var links = linkService.listAll(tgChatId);
+        var response = new ListLinksResponse();
+        if (links.isEmpty()) {
+            response.setLinks(new ArrayList<>());
+            response.size(0);
+        } else {
+            for (var link : links) {
+                response.addLinksItem(
                     new LinkResponse()
-                        .id(tgChatId)
-                        .url(new URI("https://example.com"))
-                )
-                .addLinksItem(
-                    new LinkResponse()
-                        .id(tgChatId)
-                        .url(new URI("https://something.com"))
-                )
-        );                                                      // TODO: stub!
+                        .id(link.getId())
+                        .url(link.getUrl())
+                );
+            }
+            response.size(links.size());
+        }
+        return ResponseEntity.ok().body(response);
     }
 
     /**
@@ -162,11 +171,12 @@ public class LinksController {
         @RequestBody
         AddLinkRequest addLinkRequest
     ) {
+        var addedLink = linkService.add(tgChatId, addLinkRequest.getLink());
         return ResponseEntity.ok().body(
             new LinkResponse()
-                .id(tgChatId)
-                .url(addLinkRequest.getLink())
-        );                                                      // TODO: stub!
+                .id(addedLink.getId())
+                .url(addedLink.getUrl())
+        );
     }
 
 }
