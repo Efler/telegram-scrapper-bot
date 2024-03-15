@@ -2,13 +2,25 @@ package edu.eflerrr.scrapper.client.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
-public record GithubClientResponse(
-    Long id,
-    String name,
+@Getter
+@ToString
+@EqualsAndHashCode
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class GithubClientResponse {
+    private Long id;
+    private String name;
     @JsonProperty("updated_at")
-    OffsetDateTime lastUpdate,
+    private OffsetDateTime lastUpdate;
     @JsonProperty("pushed_at")
-    OffsetDateTime pushUpdate
-) {
+    private OffsetDateTime pushUpdate;
+    private List<GithubBranchResponse> branches = new ArrayList<>();
 }
