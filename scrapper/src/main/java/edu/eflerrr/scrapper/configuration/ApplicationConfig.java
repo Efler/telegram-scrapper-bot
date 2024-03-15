@@ -13,8 +13,11 @@ public record ApplicationConfig(
     Api api,
     @Bean
     @NotNull
-    Scheduler scheduler
+    Scheduler scheduler,
+    @NotNull
+    Service service
 ) {
+
     public record Api(
         String githubBaseUrl,
         String stackoverflowBaseUrl,
@@ -22,6 +25,19 @@ public record ApplicationConfig(
     ) {
     }
 
-    public record Scheduler(boolean enable, @NotNull Duration interval, @NotNull Duration forceCheckDelay) {
+    public record Scheduler(
+        boolean enable,
+        @NotNull
+        Duration interval,
+        @NotNull
+        Duration forceCheckDelay
+    ) {
     }
+
+    public record Service(
+        @NotNull
+        String implementation
+    ) {
+    }
+
 }
