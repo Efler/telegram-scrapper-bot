@@ -18,11 +18,11 @@ public class StackoverflowClient {
         this.webClient = webClientBuilder.build();
     }
 
-    public StackoverflowClientResponse fetchResponse(String question) {
+    public StackoverflowClientResponse fetchResponse(Long questionId) {
         var stackoverflowResponse = webClient.get()
             .uri(String.format(
-                    "/questions%s/timeline?order=desc&sort=creation_date&site=stackoverflow",
-                    question
+                    "/questions/%d/timeline?order=desc&sort=creation_date&site=stackoverflow",
+                    questionId
                 )
             )
             .exchangeToMono(response -> {
