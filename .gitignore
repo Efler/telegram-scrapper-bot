@@ -1,3 +1,6 @@
+### todo-list for dev ###
+todo.txt
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
