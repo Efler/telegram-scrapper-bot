@@ -1,7 +1,7 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
 import edu.eflerrr.scrapper.IntegrationTest;
-import edu.eflerrr.scrapper.domain.dto.Branch;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Branch;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.AfterEach;
@@ -39,7 +39,7 @@ class BranchDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Branch");
+            jdbcTemplate.update("DELETE FROM \"Branch\"");
         }
 
         @Test
@@ -52,7 +52,7 @@ class BranchDaoTest extends IntegrationTest {
             );
 
             branchDao.add(branch);
-            var actualBranches = jdbcTemplate.query("SELECT * FROM Branch", (rs, rowNum) ->
+            var actualBranches = jdbcTemplate.query("SELECT * FROM \"Branch\"", (rs, rowNum) ->
                 new Branch(
                     rs.getLong("id"),
                     rs.getString("repository_owner"),
@@ -89,7 +89,7 @@ class BranchDaoTest extends IntegrationTest {
             branchDao.add(branch1);
             branchDao.add(branch2);
             branchDao.add(branch3);
-            var actualBranches = jdbcTemplate.query("SELECT * FROM Branch", (rs, rowNum) ->
+            var actualBranches = jdbcTemplate.query("SELECT * FROM \"Branch\"", (rs, rowNum) ->
                 new Branch(
                     rs.getLong("id"),
                     rs.getString("repository_owner"),
@@ -149,13 +149,13 @@ class BranchDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Branch");
+            jdbcTemplate.update("DELETE FROM \"Branch\"");
         }
 
         @Test
         public void deleteOneBranchTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -166,7 +166,7 @@ class BranchDaoTest extends IntegrationTest {
             );
 
             branchDao.delete(branch);
-            var actualBranches = jdbcTemplate.query("SELECT * FROM Branch", (rs, rowNum) ->
+            var actualBranches = jdbcTemplate.query("SELECT * FROM \"Branch\"", (rs, rowNum) ->
                 new Branch(
                     rs.getLong("id"),
                     rs.getString("repository_owner"),
@@ -183,7 +183,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void deleteSomeBranchesTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -198,16 +198,13 @@ class BranchDaoTest extends IntegrationTest {
             var branch1 = new Branch(
                 "TestOwner", "TestRepo", "TestBranch", staticDateTime
             );
-            var branch2 = new Branch(
-                "TestOwner", "TestRepo", "TestBranch2", staticDateTime
-            );
             var branch3 = new Branch(
                 "TestOwner", "TestRepo", "TestBranch3", staticDateTime
             );
 
             branchDao.delete(branch1);
             branchDao.delete(branch3);
-            var actualBranches = jdbcTemplate.query("SELECT * FROM Branch", (rs, rowNum) ->
+            var actualBranches = jdbcTemplate.query("SELECT * FROM \"Branch\"", (rs, rowNum) ->
                 new Branch(
                     rs.getLong("id"),
                     rs.getString("repository_owner"),
@@ -246,7 +243,7 @@ class BranchDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Branch");
+            jdbcTemplate.update("DELETE FROM \"Branch\"");
         }
 
         @Test
@@ -260,7 +257,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void findAllOneBranchTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -284,7 +281,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void findAllSomeBranchesTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -339,7 +336,7 @@ class BranchDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Branch");
+            jdbcTemplate.update("DELETE FROM \"Branch\"");
         }
 
         @Test
@@ -357,7 +354,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void existsBranchTrueTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -374,12 +371,12 @@ class BranchDaoTest extends IntegrationTest {
         }
     }
 
-    @Nested
+    @SuppressWarnings("SqlWithoutWhere") @Nested
     class FindAllByOwnerAndNameTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Branch");
+            jdbcTemplate.update("DELETE FROM \"Branch\"");
         }
 
         @Test
@@ -393,7 +390,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void findAllByOwnerAndNameOneBranchTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,
@@ -417,7 +414,7 @@ class BranchDaoTest extends IntegrationTest {
         @Test
         public void findAllByOwnerAndNameSomeBranchesTest() {
             String sql = """
-                INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+                INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
                 VALUES (?, ?, ?, ?)
                 """;
             jdbcTemplate.update(sql,

@@ -1,7 +1,7 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
 import edu.eflerrr.scrapper.IntegrationTest;
-import edu.eflerrr.scrapper.domain.dto.Tracking;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Tracking;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
@@ -14,6 +14,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,29 +34,29 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
         public void addOneTrackingTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 200L, "MeowMeowParrot", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://test.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://test.ru"
             );
             var tracking = new Tracking(200L, linkId);
 
             trackingDao.add(tracking);
-            var actualTrackings = jdbcTemplate.query("SELECT * FROM Tracking", (rs, rowNum) ->
+            var actualTrackings = jdbcTemplate.query("SELECT * FROM \"Tracking\"", (rs, rowNum) ->
                 new Tracking(
                     rs.getLong("id"),
                     rs.getLong("chat_id"),
@@ -73,26 +74,26 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void addSomeTrackingsTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1111L, "speed", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 2222L, "agility", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 3333L, "movement", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://speed-news.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://agility-news.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId1 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://speed-news.ru"
             );
             var linkId2 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://agility-news.ru"
             );
@@ -103,7 +104,7 @@ class TrackingDaoTest extends IntegrationTest {
             trackingDao.add(tracking1);
             trackingDao.add(tracking2);
             trackingDao.add(tracking3);
-            var actualTrackings = jdbcTemplate.query("SELECT * FROM Tracking", (rs, rowNum) ->
+            var actualTrackings = jdbcTemplate.query("SELECT * FROM \"Tracking\"", (rs, rowNum) ->
                 new Tracking(
                     rs.getLong("id"),
                     rs.getLong("chat_id"),
@@ -135,7 +136,7 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void addTrackingWithNullIdTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1111L, "Samurai-1337", OffsetDateTime.now());
             var invalidTracking = new Tracking(1111L, null);
 
@@ -145,15 +146,15 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void addSameTrackingTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1111L, "Samurai-1337", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://test.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://test.ru"
             );
@@ -167,7 +168,7 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void addTrackingWithNonExistentLinkTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 5555L, "Samurai-1337", OffsetDateTime.now());
             var nonExistingLinkTracking = new Tracking(5555L, 6666L);
 
@@ -181,31 +182,31 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
         public void deleteOneTrackingTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1234L, "TiredALot", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://1234-link.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://1234-link.ru"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 1234L, linkId);
             var tracking = new Tracking(1234L, linkId);
 
             trackingDao.delete(tracking);
-            var actualTrackings = jdbcTemplate.query("SELECT * FROM Tracking", (rs, rowNum) ->
+            var actualTrackings = jdbcTemplate.query("SELECT * FROM \"Tracking\"", (rs, rowNum) ->
                 new Tracking(
                     rs.getLong("id"),
                     rs.getLong("chat_id"),
@@ -219,38 +220,38 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void deleteSomeTrackingsTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1234L, "MillyPops", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 5678L, "HeyHeyDoggy", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://pewpewpew.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://gogogo.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://lalala.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId1 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://pewpewpew.ru"
             );
             var linkId2 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://gogogo.ru"
             );
             var linkId3 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://lalala.ru"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 1234L, linkId1);
             jdbcTemplate.update(trackingSql, 5678L, linkId2);
             jdbcTemplate.update(trackingSql, 1234L, linkId3);
@@ -259,7 +260,7 @@ class TrackingDaoTest extends IntegrationTest {
 
             trackingDao.delete(tracking1);
             trackingDao.delete(tracking3);
-            var actualTrackings = jdbcTemplate.query("SELECT * FROM Tracking", (rs, rowNum) ->
+            var actualTrackings = jdbcTemplate.query("SELECT * FROM \"Tracking\"", (rs, rowNum) ->
                 new Tracking(
                     rs.getLong("id"),
                     rs.getLong("chat_id"),
@@ -277,15 +278,15 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void deleteNonExistentTrackingTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 200L, "MeowMeowParrot", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://test.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://test.ru"
             );
@@ -302,9 +303,9 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -317,19 +318,19 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void findAllOneTrackingTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1234L, "Scarlet", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://Scarlet-web.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://Scarlet-web.ru"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 1234L, linkId);
 
             var actualTrackings = trackingDao.findAll();
@@ -344,39 +345,39 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void findAllSomeTrackingsTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 4455L, "Scarlet", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 5566L, "Scarlet", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 6677L, "Scarlet", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://uno.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://dos.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://tres.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId1 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://uno.com"
             );
             var linkId2 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://dos.com"
             );
             var linkId3 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://tres.com"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 4455L, linkId1);
             jdbcTemplate.update(trackingSql, 5566L, linkId2);
             jdbcTemplate.update(trackingSql, 6677L, linkId3);
@@ -407,9 +408,9 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -424,19 +425,19 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void existsTrackingTrueTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 1234L, "Rabbit", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://jumpers.ru",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://jumpers.ru"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 1234L, linkId);
             var tracking = new Tracking(1234L, linkId);
 
@@ -452,9 +453,9 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -467,38 +468,38 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void findAllByChatIdSomeTrackingsTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 4455L, "Rabbit", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 5566L, "Hero", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://uno.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://dos.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://tres.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId1 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://uno.com"
             );
             var linkId2 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://dos.com"
             );
             var linkId3 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://tres.com"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 4455L, linkId1);
             jdbcTemplate.update(trackingSql, 4455L, linkId2);
             jdbcTemplate.update(trackingSql, 5566L, linkId3);
@@ -523,9 +524,9 @@ class TrackingDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Tracking");
-            jdbcTemplate.update("DELETE FROM Chat");
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Tracking\"");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -538,30 +539,30 @@ class TrackingDaoTest extends IntegrationTest {
 
         @Test
         public void findAllByLinkIdSomeTrackingsTest() {
-            String chatSql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(chatSql, 4455L, "Rabbit", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 5566L, "Hero", OffsetDateTime.now());
             jdbcTemplate.update(chatSql, 6677L, "Villain", OffsetDateTime.now());
-            String linkSql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String linkSql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(linkSql,
                 "https://uno.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             jdbcTemplate.update(linkSql,
                 "https://dos.com",
-                OffsetDateTime.now(), OffsetDateTime.MIN, OffsetDateTime.now()
+                OffsetDateTime.now(), MIN_DATE_TIME, OffsetDateTime.now()
             );
             var linkId1 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://uno.com"
             );
             var linkId2 = jdbcTemplate.queryForObject(
-                "SELECT id FROM Link WHERE url = ?",
+                "SELECT id FROM \"Link\" WHERE url = ?",
                 Long.class,
                 "https://dos.com"
             );
-            String trackingSql = "INSERT INTO Tracking (chat_id, link_id) VALUES (?, ?)";
+            String trackingSql = "INSERT INTO \"Tracking\" (chat_id, link_id) VALUES (?, ?)";
             jdbcTemplate.update(trackingSql, 4455L, linkId1);
             jdbcTemplate.update(trackingSql, 5566L, linkId2);
             jdbcTemplate.update(trackingSql, 6677L, linkId2);
