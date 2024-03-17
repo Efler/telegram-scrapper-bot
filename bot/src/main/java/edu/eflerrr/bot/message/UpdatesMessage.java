@@ -9,9 +9,9 @@ public class UpdatesMessage {
     public final static String UPDATE_MESSAGE_TEMPLATE = """
         *Новое обновление\\!*
 
-        ___Ресурс_\r__: %s
-        ___Описание_\r__: %s
-        ___Ссылка_\r__: %s
+        *__Ресурс__* \\-\\> %s
+        *__Описание__* \\-\\> %s
+        *__Ссылка__* \\-\\> %s
         """;
 
     public final static String REPOSITORY_UPDATE =
