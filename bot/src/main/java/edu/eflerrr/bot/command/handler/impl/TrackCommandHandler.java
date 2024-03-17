@@ -1,14 +1,16 @@
 package edu.eflerrr.bot.command.handler.impl;
 
 import com.pengrad.telegrambot.model.Update;
+import edu.eflerrr.bot.client.ScrapperClient;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.configuration.ApplicationConfig;
-import edu.eflerrr.bot.repository.BotRepository;
+import edu.eflerrr.bot.exception.DuplicateLinkPostException;
+import edu.eflerrr.bot.exception.TgChatNotExistException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import static edu.eflerrr.bot.message.BotMessage.SITE_ERROR;
 import static edu.eflerrr.bot.message.BotMessage.TRACK_COMMAND_EXISTING_URL;
@@ -18,17 +20,12 @@ import static edu.eflerrr.bot.message.BotMessage.URL_ERROR;
 import static edu.eflerrr.bot.message.BotMessage.USER_NOT_FOUND_ERROR;
 
 @Component
+@RequiredArgsConstructor
 public class TrackCommandHandler implements CommandHandler {
     private final String name = "/track";
     private final String description = "Начать отслеживание ссылки";
-    private final BotRepository repository;
     private final ApplicationConfig config;
-
-    @Autowired
-    public TrackCommandHandler(BotRepository repository, ApplicationConfig config) {
-        this.repository = repository;
-        this.config = config;
-    }
+    private final ScrapperClient scrapperClient;
 
     @Override
     public String getCommandName() {
@@ -51,8 +48,8 @@ public class TrackCommandHandler implements CommandHandler {
 
     @Override
     public String handle(Update update) {
-        var command = update.message().text();
         String answer;
+        var command = update.message().text();
         if (!checkFormat(command)) {
             throw new IllegalArgumentException("Invalid command format!");
         }
@@ -61,22 +58,22 @@ public class TrackCommandHandler implements CommandHandler {
         } else {
             URL url;
             try {
-                url = new URI(command.substring(name.length() + 1)).toURL();
-            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException ex) {
+                url = URI.create(command.substring(name.length() + 1)).toURL();
+            } catch (IllegalArgumentException | MalformedURLException ex) {
                 return URL_ERROR;
             }
             if (!checkUrlSupport(url)) {
                 answer = SITE_ERROR;
             } else {
-                var chatId = update.message().chat().id();
                 try {
-                    if (repository.trackLink(chatId, url)) {
-                        answer = TRACK_COMMAND_SUCCESS;
-                    } else {
-                        answer = TRACK_COMMAND_EXISTING_URL;
-                    }
-                } catch (IllegalArgumentException e) {
-                    return USER_NOT_FOUND_ERROR;
+                    scrapperClient.trackLink(update.message().chat().id(), url.toURI());
+                    answer = TRACK_COMMAND_SUCCESS;
+                } catch (DuplicateLinkPostException ex) {
+                    answer = TRACK_COMMAND_EXISTING_URL;
+                } catch (TgChatNotExistException ex) {
+                    answer = USER_NOT_FOUND_ERROR;
+                } catch (URISyntaxException ex) {
+                    throw new RuntimeException(ex.getMessage());
                 }
             }
         }
