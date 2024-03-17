@@ -4,13 +4,15 @@ app:
     - github.com
     - stackoverflow.com
   api:
-    scrapper-base-url: localhost:8080
+    scrapper-base-url: http://localhost:8080
 
 spring:
   application:
     name: bot
   jackson:
     time-zone: UTC
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 springdoc:
   swagger-ui:
