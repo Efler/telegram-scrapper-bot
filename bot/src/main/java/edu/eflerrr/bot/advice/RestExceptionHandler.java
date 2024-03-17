@@ -10,7 +10,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RestControllerAdvice
 public class RestExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)      // TODO: stub!
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiErrorResponse> invalidRequestData(MethodArgumentTypeMismatchException ex) {
         var response = new ApiErrorResponse()
             .description("Некорректные параметры запроса")
