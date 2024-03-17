@@ -1,4 +1,4 @@
-package edu.eflerrr.scrapper.domain.dto;
+package edu.eflerrr.scrapper.domain.jdbc.dto;
 
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 
 @Getter
 @EqualsAndHashCode
@@ -24,7 +25,7 @@ public class Link {
         this.id = null;
         this.url = url;
         this.createdAt = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
-        this.checkedAt = OffsetDateTime.MIN;
+        this.checkedAt = MIN_DATE_TIME;
         this.updatedAt = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     }
 
@@ -32,7 +33,7 @@ public class Link {
         this.id = null;
         this.url = url;
         this.createdAt = createdAt;
-        this.checkedAt = OffsetDateTime.MIN;
+        this.checkedAt = MIN_DATE_TIME;
         this.updatedAt = createdAt;
     }
 
@@ -40,7 +41,7 @@ public class Link {
         this.id = id;
         this.url = url;
         this.createdAt = createdAt;
-        this.checkedAt = OffsetDateTime.MIN;
+        this.checkedAt = MIN_DATE_TIME;
         this.updatedAt = createdAt;
     }
 
