@@ -1,6 +1,6 @@
 package edu.eflerrr.scrapper.service;
 
-import edu.eflerrr.scrapper.domain.dto.Link;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Link;
 import java.net.URI;
 import java.util.List;
 
