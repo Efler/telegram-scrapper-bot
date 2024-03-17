@@ -1,13 +1,15 @@
 package edu.eflerrr.bot.command.handler.impl;
 
 import com.pengrad.telegrambot.model.Update;
+import edu.eflerrr.bot.client.ScrapperClient;
 import edu.eflerrr.bot.command.handler.CommandHandler;
-import edu.eflerrr.bot.repository.BotRepository;
+import edu.eflerrr.bot.exception.LinkNotFoundException;
+import edu.eflerrr.bot.exception.TgChatNotExistException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import static edu.eflerrr.bot.message.BotMessage.UNTRACK_COMMAND_FORMAT_ERROR;
 import static edu.eflerrr.bot.message.BotMessage.UNTRACK_COMMAND_SUCCESS;
@@ -16,15 +18,11 @@ import static edu.eflerrr.bot.message.BotMessage.URL_ERROR;
 import static edu.eflerrr.bot.message.BotMessage.USER_NOT_FOUND_ERROR;
 
 @Component
+@RequiredArgsConstructor
 public class UntrackCommandHandler implements CommandHandler {
     private final String name = "/untrack";
     private final String description = "Прекратить отслеживание ссылки";
-    private final BotRepository repository;
-
-    @Autowired
-    public UntrackCommandHandler(BotRepository repository) {
-        this.repository = repository;
-    }
+    private final ScrapperClient scrapperClient;
 
     @Override
     public String getCommandName() {
@@ -43,8 +41,8 @@ public class UntrackCommandHandler implements CommandHandler {
 
     @Override
     public String handle(Update update) {
-        var command = update.message().text();
         String answer;
+        var command = update.message().text();
         if (!checkFormat(command)) {
             throw new IllegalArgumentException("Invalid command format!");
         }
@@ -53,19 +51,19 @@ public class UntrackCommandHandler implements CommandHandler {
         } else {
             URL url;
             try {
-                url = new URI(command.substring(name.length() + 1)).toURL();
-            } catch (IllegalArgumentException | MalformedURLException | URISyntaxException ex) {
+                url = URI.create(command.substring(name.length() + 1)).toURL();
+            } catch (IllegalArgumentException | MalformedURLException ex) {
                 return URL_ERROR;
             }
-            var chatId = update.message().chat().id();
             try {
-                if (repository.untrackLink(chatId, url)) {
-                    answer = UNTRACK_COMMAND_SUCCESS;
-                } else {
-                    answer = UNTRACK_COMMAND_URL_NOT_FOUND;
-                }
-            } catch (IllegalArgumentException e) {
-                return USER_NOT_FOUND_ERROR;
+                scrapperClient.untrackLink(update.message().chat().id(), url.toURI());
+                answer = UNTRACK_COMMAND_SUCCESS;
+            } catch (LinkNotFoundException ex) {
+                answer = UNTRACK_COMMAND_URL_NOT_FOUND;
+            } catch (TgChatNotExistException ex) {
+                answer = USER_NOT_FOUND_ERROR;
+            } catch (URISyntaxException ex) {
+                throw new RuntimeException(ex.getMessage());
             }
         }
         return answer;
