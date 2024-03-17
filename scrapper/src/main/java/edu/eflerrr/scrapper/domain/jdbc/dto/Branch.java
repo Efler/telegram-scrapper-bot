@@ -1,4 +1,4 @@
-package edu.eflerrr.scrapper.domain.dto;
+package edu.eflerrr.scrapper.domain.jdbc.dto;
 
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;

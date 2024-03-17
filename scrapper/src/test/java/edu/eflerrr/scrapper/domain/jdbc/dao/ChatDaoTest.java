@@ -1,7 +1,7 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
 import edu.eflerrr.scrapper.IntegrationTest;
-import edu.eflerrr.scrapper.domain.dto.Chat;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Chat;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import org.junit.jupiter.api.AfterEach;
@@ -41,7 +41,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Chat");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
         }
 
         @Test
@@ -53,7 +53,7 @@ class ChatDaoTest extends IntegrationTest {
 
                 chatDao.add(chat);
             }
-            var actualChats = jdbcTemplate.query("SELECT * FROM Chat", (rs, rowNum) ->
+            var actualChats = jdbcTemplate.query("SELECT * FROM \"Chat\"", (rs, rowNum) ->
                 new Chat(
                     rs.getLong("id"),
                     rs.getString("username"),
@@ -84,7 +84,7 @@ class ChatDaoTest extends IntegrationTest {
                 chatDao.add(chat2);
                 chatDao.add(chat3);
             }
-            var actualChats = jdbcTemplate.query("SELECT * FROM Chat", (rs, rowNum) ->
+            var actualChats = jdbcTemplate.query("SELECT * FROM \"Chat\"", (rs, rowNum) ->
                 new Chat(
                     rs.getLong("id"),
                     rs.getString("username"),
@@ -123,17 +123,17 @@ class ChatDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Chat");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
         }
 
         @Test
         public void deleteOneChatTest() {
-            String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, 1234, "MillyPops", staticDateTime);
             var chat = new Chat(1234L, "MillyPops", staticDateTime);
 
             chatDao.delete(chat);
-            var actualChats = jdbcTemplate.query("SELECT * FROM Chat", (rs, rowNum) ->
+            var actualChats = jdbcTemplate.query("SELECT * FROM \"Chat\"", (rs, rowNum) ->
                 new Chat(
                     rs.getLong("id"),
                     rs.getString("username"),
@@ -147,7 +147,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @Test
         public void deleteSomeChatsTest() {
-            String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, 1234, "MillyPops", staticDateTime);
             jdbcTemplate.update(sql, 5678, "HeyHeyDoggy", staticDateTime);
             jdbcTemplate.update(sql, 9999, "KittyKitty", staticDateTime);
@@ -157,7 +157,7 @@ class ChatDaoTest extends IntegrationTest {
 
             chatDao.delete(chat1);
             chatDao.delete(chat3);
-            var actualChats = jdbcTemplate.query("SELECT * FROM Chat", (rs, rowNum) ->
+            var actualChats = jdbcTemplate.query("SELECT * FROM \"Chat\"", (rs, rowNum) ->
                 new Chat(
                     rs.getLong("id"),
                     rs.getString("username"),
@@ -185,7 +185,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Chat");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
         }
 
         @Test
@@ -198,7 +198,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @Test
         public void findAllOneChatTest() {
-            String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, 8888, "MeowMeowParrot", staticDateTime);
             var expectedChat = new Chat(8888L, "MeowMeowParrot", staticDateTime);
 
@@ -211,7 +211,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @Test
         public void findAllSomeChatsTest() {
-            String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, 1000, "OneSheep", staticDateTime);
             jdbcTemplate.update(sql, 2000, "TwoSheep", staticDateTime);
             jdbcTemplate.update(sql, 3000, "ThreeSheep", staticDateTime);
@@ -232,7 +232,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Chat");
+            jdbcTemplate.update("DELETE FROM \"Chat\"");
         }
 
         @Test
@@ -247,7 +247,7 @@ class ChatDaoTest extends IntegrationTest {
 
         @Test
         public void existsChatTrueTest() {
-            String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+            String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
             jdbcTemplate.update(sql, 1234, "MillyPops", staticDateTime);
             var chat = new Chat(1234L, "MillyPops", staticDateTime);
 

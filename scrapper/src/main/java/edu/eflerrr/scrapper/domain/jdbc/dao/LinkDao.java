@@ -1,6 +1,6 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
-import edu.eflerrr.scrapper.domain.dto.Link;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Link;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -26,7 +26,7 @@ public class LinkDao {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
         }
-        String countSql = "SELECT COUNT(*) AS row_count FROM Link WHERE url = ?";
+        String countSql = "SELECT COUNT(*) AS row_count FROM \"Link\" WHERE url = ?";
         var rowCount = jdbcTemplate.queryForObject(countSql, Integer.class, link.getUrl().toString());
         return rowCount != null && rowCount == 1;
     }
@@ -36,7 +36,7 @@ public class LinkDao {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
         }
-        String sql = "SELECT id FROM Link WHERE url = ?";
+        String sql = "SELECT id FROM \"Link\" WHERE url = ?";
         try {
             return jdbcTemplate.queryForObject(sql, Long.class, link.getUrl().toString());
         } catch (EmptyResultDataAccessException ex) {
@@ -46,7 +46,7 @@ public class LinkDao {
 
     @Transactional
     public Link getLinkById(long id) {
-        String sql = "SELECT * FROM Link WHERE id = ?";
+        String sql = "SELECT * FROM \"Link\" WHERE id = ?";
         var linkList = jdbcTemplate.query(sql, (rs, rowNum) -> {
                 try {
                     return new Link(
@@ -73,7 +73,7 @@ public class LinkDao {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
         }
-        String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
         var currentTime = OffsetDateTime.now();
         jdbcTemplate.update(sql, link.getUrl().toString(),
             currentTime.withOffsetSameInstant(ZoneOffset.UTC),
@@ -91,13 +91,13 @@ public class LinkDao {
             throw new InvalidDataAccessResourceUsageException("Link not found!");
         }
 
-        String sql = "DELETE FROM Link WHERE url = ?";
+        String sql = "DELETE FROM \"Link\" WHERE url = ?";
         jdbcTemplate.update(sql, link.getUrl().toString());
     }
 
     @Transactional
     public List<Link> findAll() {
-        String sql = "SELECT * FROM Link";
+        String sql = "SELECT * FROM \"Link\"";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
                 try {
                     return new Link(
@@ -117,7 +117,7 @@ public class LinkDao {
     @Transactional
     public List<Link> findAllWithFilter(Duration duration, OffsetDateTime currentTime) {
         String filterSql =
-            "SELECT * FROM Link WHERE checked_at < (? - INTERVAL '" + duration.toSeconds() + " seconds')";
+            "SELECT * FROM \"Link\" WHERE checked_at < (? - INTERVAL '" + duration.toSeconds() + " seconds')";
         return jdbcTemplate.query(filterSql, (rs, rowNum) -> {
                 try {
                     return new Link(
@@ -143,7 +143,7 @@ public class LinkDao {
             throw new InvalidDataAccessResourceUsageException("Link not found!");
         }
 
-        String sql = "UPDATE Link SET checked_at = ? WHERE url = ?";
+        String sql = "UPDATE \"Link\" SET checked_at = ? WHERE url = ?";
         jdbcTemplate.update(sql, newCheckedAt.withOffsetSameInstant(ZoneOffset.UTC), link.getUrl().toString());
     }
 
@@ -156,7 +156,7 @@ public class LinkDao {
             throw new InvalidDataAccessResourceUsageException("Link not found!");
         }
 
-        String sql = "UPDATE Link SET updated_at = ? WHERE url = ?";
+        String sql = "UPDATE \"Link\" SET updated_at = ? WHERE url = ?";
         jdbcTemplate.update(sql, newUpdatedAt.withOffsetSameInstant(ZoneOffset.UTC), link.getUrl().toString());
     }
 
