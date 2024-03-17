@@ -1,11 +1,11 @@
 package edu.eflerrr.scrapper.service.jdbc;
 
-import edu.eflerrr.scrapper.domain.dao.ChatDao;
-import edu.eflerrr.scrapper.domain.dao.LinkDao;
-import edu.eflerrr.scrapper.domain.dao.TrackingDao;
-import edu.eflerrr.scrapper.domain.dto.Chat;
-import edu.eflerrr.scrapper.domain.dto.Link;
-import edu.eflerrr.scrapper.domain.dto.Tracking;
+import edu.eflerrr.scrapper.domain.jdbc.dao.ChatDao;
+import edu.eflerrr.scrapper.domain.jdbc.dao.LinkDao;
+import edu.eflerrr.scrapper.domain.jdbc.dao.TrackingDao;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Chat;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Link;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Tracking;
 import edu.eflerrr.scrapper.exception.DuplicateLinkPostException;
 import edu.eflerrr.scrapper.exception.LinkNotFoundException;
 import edu.eflerrr.scrapper.exception.TgChatNotExistException;
@@ -14,6 +14,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jdbc")
 @RequiredArgsConstructor
+@Slf4j
 public class JdbcLinkService implements LinkService {
 
     private final ChatDao chatDao;
@@ -31,6 +33,7 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public Link add(long tgChatId, URI url) {
+        log.debug("ADD IN LINK-SERVICE (JDBC): tgChatId: {}, url: {}", tgChatId, url);
         if (!chatDao.exists(
             new Chat(tgChatId, autoUsernamePrefix + tgChatId)
         )) {
@@ -54,7 +57,8 @@ public class JdbcLinkService implements LinkService {
     }
 
     @Override
-    public Link delete(long tgCHatId, URI url) {
+    public Link delete(long tgChatId, URI url) {
+        log.debug("DELETE IN LINK-SERVICE (JDBC): tgChatId: {}, url: {}", tgChatId, url);
         var link = new Link(url);
         Long linkId;
         try {
@@ -62,14 +66,19 @@ public class JdbcLinkService implements LinkService {
         } catch (InvalidDataAccessResourceUsageException ex) {
             throw new LinkNotFoundException(ex.getMessage());
         }
+        if (!chatDao.exists(
+            new Chat(tgChatId, autoUsernamePrefix + tgChatId)
+        )) {
+            throw new TgChatNotExistException(chatNotFoundErrorMessage);
+        }
         try {
             trackingDao.delete(
                 new Tracking(
-                    tgCHatId, linkId
+                    tgChatId, linkId
                 )
             );
         } catch (InvalidDataAccessResourceUsageException ex) {
-            throw new TgChatNotExistException(ex.getMessage());
+            throw new LinkNotFoundException(ex.getMessage());
         }
         var deletedLink = linkDao.getLinkById(linkId);
         if (trackingDao.findAllByLinkId(linkId).isEmpty()) {
@@ -80,6 +89,7 @@ public class JdbcLinkService implements LinkService {
 
     @Override
     public List<Link> listAll(long tgChatId) {
+        log.debug("LIST-ALL IN LINK-SERVICE (JDBC): tgChatId: {}", tgChatId);
         if (!chatDao.exists(
             new Chat(tgChatId, autoUsernamePrefix + tgChatId)
         )) {
