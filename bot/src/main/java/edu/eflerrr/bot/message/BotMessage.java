@@ -70,4 +70,13 @@ public class BotMessage {
     public static final String UNKNOWN_COMMAND_ERROR =
         "Прости, но я ___не знаю_\r__ такой команды\\! "
             + "Попробуйте начать с команды /help";
+
+    public static final String REMOVE_ME_COMMAND_SUCCESS =
+        "Твой аккаунт ___успешно удален_\r__ из базы данных\\! "
+            + "Если захочешь вернуться, начни с команды /start\\!";
+
+    public static final String REMOVE_ME_COMMAND_USER_NOT_FOUND =
+        "Аккаунт ___уже был удален_\r__ из базы данных\\! "
+            + "Если что, ты всегда можешь вернуться с помощью команды /start\\!";
+
 }
