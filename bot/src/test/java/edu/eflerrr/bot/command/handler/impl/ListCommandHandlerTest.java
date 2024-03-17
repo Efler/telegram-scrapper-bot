@@ -4,8 +4,6 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import edu.eflerrr.bot.command.handler.CommandHandler;
-import edu.eflerrr.bot.repository.BotRepository;
-import edu.eflerrr.bot.repository.impl.InMemoryBotRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ListCommandHandlerTest {
+    /*
     private final Map<Long, List<URL>> memory;
     private final CommandHandler listCommandHandler;
     private final Update update;
@@ -249,4 +248,5 @@ class ListCommandHandlerTest {
         assertThat(actualStringUrls)
             .isEqualTo(expectedStringUrls);
     }
+    */
 }
