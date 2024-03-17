@@ -1,6 +1,6 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
-import edu.eflerrr.scrapper.domain.dto.Chat;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Chat;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -18,14 +18,14 @@ public class ChatDao {
 
     @Transactional
     public boolean exists(Chat chat) {
-        String countSql = "SELECT COUNT(*) AS row_count FROM Chat WHERE id = ? AND username = ?";
+        String countSql = "SELECT COUNT(*) AS row_count FROM \"Chat\" WHERE id = ? AND username = ?";
         var rowCount = jdbcTemplate.queryForObject(countSql, Integer.class, chat.getId(), chat.getUsername());
         return rowCount != null && rowCount == 1;
     }
 
     @Transactional
     public void add(Chat chat) {
-        String sql = "INSERT INTO Chat (id, username, created_at) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, chat.getId(), chat.getUsername(),
             OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC)
         );
@@ -37,13 +37,13 @@ public class ChatDao {
             throw new InvalidDataAccessResourceUsageException("Chat not found!");
         }
 
-        String sql = "DELETE FROM Chat WHERE id = ? AND username = ?";
+        String sql = "DELETE FROM \"Chat\" WHERE id = ? AND username = ?";
         jdbcTemplate.update(sql, chat.getId(), chat.getUsername());
     }
 
     @Transactional
     public List<Chat> findAll() {
-        String sql = "SELECT * FROM Chat";
+        String sql = "SELECT * FROM \"Chat\"";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
             new Chat(
                 rs.getLong("id"),
