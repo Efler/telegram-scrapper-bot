@@ -5,7 +5,6 @@ import com.pengrad.telegrambot.model.Update;
 import edu.eflerrr.bot.command.list.CommandHandlerList;
 import edu.eflerrr.bot.command.list.impl.BotCommandHandlerList;
 import edu.eflerrr.bot.configuration.ApplicationConfig;
-import edu.eflerrr.bot.repository.BotRepository;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
