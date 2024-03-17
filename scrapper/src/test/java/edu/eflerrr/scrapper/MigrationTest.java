@@ -37,7 +37,7 @@ class MigrationTest extends IntegrationTest {
             assertThat(tableNames)
                 .hasSize(6)
                 .containsExactlyInAnyOrder(
-                    "chat", "link", "tracking", "branch", "databasechangelog", "databasechangeloglock"
+                    "Chat", "Link", "Tracking", "Branch", "databasechangelog", "databasechangeloglock"
                 );
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
