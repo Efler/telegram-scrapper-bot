@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import static edu.eflerrr.bot.message.UpdatesMessage.QUESTION_ACCEPTED_ANSWER;
 import static edu.eflerrr.bot.message.UpdatesMessage.QUESTION_ANSWER;
@@ -22,6 +23,8 @@ import static edu.eflerrr.bot.message.UpdatesMessage.UPDATE_MESSAGE_TEMPLATE;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@SuppressWarnings("MagicNumber")
 public class UpdatesService {
 
     private final TelegramBot bot;
@@ -45,18 +48,23 @@ public class UpdatesService {
 
     public void processUpdate(Long id, URL url, String description, List<Long> tgChatIds) {
         String resourceName;
-        if (id == 5L) {
+        if (id >= 5L) {
             resourceName = url.getPath().split("/")[3];
         } else {
             resourceName = url.getPath().split("/")[1] + "/" + url.getPath().split("/")[2];
         }
 
+        log.debug("Processing update for resource: {}, url: {}", resourceName, url);
+
         var updateMessage = String.format(
             UPDATE_MESSAGE_TEMPLATE,
             stringToMarkdown(resourceName),
-            questionEventMessages.get(id),
-            url
+            stringToMarkdown(questionEventMessages.get(id)),
+            stringToMarkdown(url.toString())
         );
+
+        log.debug("Sending message to bot:\n{}", updateMessage);
+
         for (var chatId : tgChatIds) {
             bot.execute(
                 new SendMessage(chatId, updateMessage)
