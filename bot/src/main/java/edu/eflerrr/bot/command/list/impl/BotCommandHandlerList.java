@@ -3,6 +3,7 @@ package edu.eflerrr.bot.command.list.impl;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.command.handler.impl.HelpCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.ListCommandHandler;
+import edu.eflerrr.bot.command.handler.impl.RemoveMeCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.StartCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.TrackCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.UntrackCommandHandler;
@@ -21,9 +22,10 @@ public class BotCommandHandlerList implements CommandHandlerList {
         HelpCommandHandler help,
         TrackCommandHandler track,
         UntrackCommandHandler untrack,
-        ListCommandHandler list
+        ListCommandHandler list,
+        RemoveMeCommandHandler removeMe
     ) {
-        commands = List.of(start, help, track, untrack, list);
+        commands = List.of(start, help, track, untrack, list, removeMe);
     }
 
     @Override
