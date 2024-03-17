@@ -45,19 +45,15 @@ public class BotService {
                 handler = h;
             }
         }
-        if (handler != null) {
-            String botAnswer = handler.handle(update);
-            return new SendMessage(
-                update.message().chat().id(),
-                botAnswer
-            )
-                .parseMode(ParseMode.MarkdownV2)
-                .disableWebPagePreview(true);
-        } else {
-            return new SendMessage(
-                update.message().chat().id(), UNKNOWN_COMMAND_ERROR
-            );
-        }
+        String botAnswer = handler != null
+            ? handler.handle(update)
+            : UNKNOWN_COMMAND_ERROR;
+        return new SendMessage(
+            update.message().chat().id(),
+            botAnswer
+        )
+            .parseMode(ParseMode.MarkdownV2)
+            .disableWebPagePreview(true);
     }
 
     @EventListener(ApplicationReadyEvent.class)
