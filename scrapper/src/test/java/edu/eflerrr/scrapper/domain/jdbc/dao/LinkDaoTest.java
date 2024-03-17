@@ -1,7 +1,7 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
 import edu.eflerrr.scrapper.IntegrationTest;
-import edu.eflerrr.scrapper.domain.dto.Link;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Link;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -20,6 +20,7 @@ import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -44,7 +45,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -57,7 +58,7 @@ class LinkDaoTest extends IntegrationTest {
 
                 linkDao.add(link);
             }
-            var actualLinks = jdbcTemplate.query("SELECT * FROM Link", (rs, rowNum) ->
+            var actualLinks = jdbcTemplate.query("SELECT * FROM \"Link\"", (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -80,7 +81,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLinks.getFirst().getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLinks.getFirst().getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLinks.getFirst().getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
@@ -101,7 +102,7 @@ class LinkDaoTest extends IntegrationTest {
                 linkDao.add(link2);
                 linkDao.add(link3);
             }
-            var actualLinks = jdbcTemplate.query("SELECT * FROM Link", (rs, rowNum) ->
+            var actualLinks = jdbcTemplate.query("SELECT * FROM \"Link\"", (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -128,7 +129,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink1.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink1.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
 
@@ -137,7 +138,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink2.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink2.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
 
@@ -146,7 +147,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink3.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink3.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
@@ -185,17 +186,17 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
         public void deleteOneLinkTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://hey.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://hey.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
             var link = new Link(new URI("https://hey.ru"), staticDateTime);
 
             linkDao.delete(link);
-            var actualLinks = jdbcTemplate.query("SELECT * FROM Link", (rs, rowNum) ->
+            var actualLinks = jdbcTemplate.query("SELECT * FROM \"Link\"", (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -217,17 +218,17 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void deleteSomeLinksTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://hey1.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
-            jdbcTemplate.update(sql, "https://hey2.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
-            jdbcTemplate.update(sql, "https://hey3.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://hey1.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
+            jdbcTemplate.update(sql, "https://hey2.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
+            jdbcTemplate.update(sql, "https://hey3.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
             var link1 = new Link(new URI("https://hey1.ru"), staticDateTime);
             var link2 = new Link(new URI("https://hey2.ru"), staticDateTime);
             var link3 = new Link(new URI("https://hey3.ru"), staticDateTime);
 
             linkDao.delete(link1);
             linkDao.delete(link3);
-            var actualLinks = jdbcTemplate.query("SELECT * FROM Link", (rs, rowNum) ->
+            var actualLinks = jdbcTemplate.query("SELECT * FROM \"Link\"", (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -250,7 +251,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(link2.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(link2.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(link2.getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
@@ -270,7 +271,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -283,8 +284,8 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void findAllOneLinkTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://wowowow.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://wowowow.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
 
             var actualLinks = linkDao.findAll();
 
@@ -295,17 +296,17 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLinks.getFirst().getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLinks.getFirst().getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLinks.getFirst().getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
 
         @Test
         public void findAllSomeLinksTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://rabbit.com", staticDateTime, OffsetDateTime.MIN, staticDateTime);
-            jdbcTemplate.update(sql, "https://wolf.com", staticDateTime, OffsetDateTime.MIN, staticDateTime);
-            jdbcTemplate.update(sql, "https://fox.com", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://rabbit.com", staticDateTime, MIN_DATE_TIME, staticDateTime);
+            jdbcTemplate.update(sql, "https://wolf.com", staticDateTime, MIN_DATE_TIME, staticDateTime);
+            jdbcTemplate.update(sql, "https://fox.com", staticDateTime, MIN_DATE_TIME, staticDateTime);
 
             var actualLinks = linkDao.findAll();
             var actualLink1 = actualLinks.get(0);
@@ -320,7 +321,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink1.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink1.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
 
@@ -329,7 +330,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink2.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink2.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
 
@@ -338,7 +339,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink3.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink3.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink1.getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
@@ -349,7 +350,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -364,8 +365,8 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void existsLinkTrueTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://crow.ru", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://crow.ru", staticDateTime, MIN_DATE_TIME, staticDateTime);
             var link = new Link(new URI("https://crow.ru"), staticDateTime);
 
             var actualResult = linkDao.exists(link);
@@ -380,7 +381,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -398,7 +399,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void findAllWithFilterSomeLinksTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sql, "https://rabbit.com", staticDateTime,
                 staticDateTime.minusSeconds(30), staticDateTime
             );
@@ -439,7 +440,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -451,9 +452,9 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void getLinkByIdSuccessfulTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://i-exist.ua", staticDateTime, OffsetDateTime.MIN, staticDateTime);
-            sql = "SELECT id FROM Link WHERE url = ?";
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://i-exist.ua", staticDateTime, MIN_DATE_TIME, staticDateTime);
+            sql = "SELECT id FROM \"Link\" WHERE url = ?";
             var linkId = jdbcTemplate.queryForObject(sql, Long.class, "https://i-exist.ua");
 
             assertThat(linkId)
@@ -468,7 +469,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink.getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
@@ -479,7 +480,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -500,10 +501,10 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void getIdSuccessfulTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
-            jdbcTemplate.update(sql, "https://i-exist.ua", staticDateTime, OffsetDateTime.MIN, staticDateTime);
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sql, "https://i-exist.ua", staticDateTime, MIN_DATE_TIME, staticDateTime);
             var link = new Link(new URI("https://i-exist.ua"), staticDateTime);
-            sql = "SELECT id FROM Link WHERE url = ?";
+            sql = "SELECT id FROM \"Link\" WHERE url = ?";
             var expectedId = jdbcTemplate.queryForObject(sql, Long.class, "https://i-exist.ua");
 
             var actualId = linkDao.getId(link);
@@ -520,7 +521,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -541,7 +542,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void updateCheckedAtSuccessfulTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sql,
                 "https://i-exist.ua", staticDateTime, OffsetDateTime.MAX, staticDateTime
             );
@@ -552,7 +553,7 @@ class LinkDaoTest extends IntegrationTest {
             linkDao.updateCheckedAt(link, staticDateTime);
 
             var actualLink =
-                jdbcTemplate.queryForObject("SELECT * FROM Link WHERE url = 'https://i-exist.ua'", (rs, rowNum) ->
+                jdbcTemplate.queryForObject("SELECT * FROM \"Link\" WHERE url = 'https://i-exist.ua'", (rs, rowNum) ->
                     {
                         try {
                             return new Link(
@@ -586,7 +587,7 @@ class LinkDaoTest extends IntegrationTest {
 
         @AfterEach
         public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM Link");
+            jdbcTemplate.update("DELETE FROM \"Link\"");
         }
 
         @Test
@@ -607,17 +608,17 @@ class LinkDaoTest extends IntegrationTest {
 
         @Test
         public void updateUpdatedAtSuccessfulTest() throws URISyntaxException {
-            String sql = "INSERT INTO Link (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
             jdbcTemplate.update(sql,
-                "https://i-exist.ua", staticDateTime, OffsetDateTime.MIN, OffsetDateTime.MAX
+                "https://i-exist.ua", staticDateTime, MIN_DATE_TIME, OffsetDateTime.MAX
             );
             var link = new Link(
-                1L, new URI("https://i-exist.ua"), staticDateTime, OffsetDateTime.MIN, OffsetDateTime.MAX
+                1L, new URI("https://i-exist.ua"), staticDateTime, MIN_DATE_TIME, OffsetDateTime.MAX
             );
 
             linkDao.updateUpdatedAt(link, staticDateTime);
 
-            var actualLink = jdbcTemplate.queryForObject("SELECT * FROM Link WHERE id = 1", (rs, rowNum) ->
+            var actualLink = jdbcTemplate.queryForObject("SELECT * FROM \"Link\" WHERE id = 1", (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -642,7 +643,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink.getCreatedAt())
                 .isEqualTo(staticDateTime);
             assertThat(actualLink.getCheckedAt())
-                .isEqualTo(OffsetDateTime.MIN);
+                .isEqualTo(MIN_DATE_TIME);
             assertThat(actualLink.getUpdatedAt())
                 .isEqualTo(staticDateTime);
         }
