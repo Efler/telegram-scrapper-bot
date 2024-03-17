@@ -2,11 +2,11 @@ app:
   api:
     github-base-url: https://api.github.com
     stackoverflow-base-url: https://api.stackexchange.com
-    bot-base-url: localhost:8090
+    bot-base-url: http://localhost:8090
   scheduler:
-    enable: true
-    interval: 5s
-    force-check-delay: 15s
+    enable: false
+    interval: 30s
+    force-check-delay: 40s
   service:
     implementation: jdbc
 
