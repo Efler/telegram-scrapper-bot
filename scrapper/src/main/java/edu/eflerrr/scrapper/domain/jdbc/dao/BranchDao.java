@@ -1,6 +1,6 @@
-package edu.eflerrr.scrapper.domain.dao;
+package edu.eflerrr.scrapper.domain.jdbc.dao;
 
-import edu.eflerrr.scrapper.domain.dto.Branch;
+import edu.eflerrr.scrapper.domain.jdbc.dto.Branch;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("MultipleStringLiterals")
 public class BranchDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -19,7 +20,7 @@ public class BranchDao {
     public boolean exists(Branch branch) {
         String countSql = """
             SELECT COUNT(*) AS row_count\s
-            FROM Branch\s
+            FROM "Branch"\s
             WHERE repository_owner = ? AND repository_name = ? AND branch_name = ?
             """;
         var rowCount = jdbcTemplate.queryForObject(
@@ -35,7 +36,7 @@ public class BranchDao {
     @Transactional
     public void add(Branch branch) {
         String sql = """
-            INSERT INTO Branch (repository_owner, repository_name, branch_name, last_commit_time)\s
+            INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
             VALUES (?, ?, ?, ?)
             """;
         jdbcTemplate.update(
@@ -54,7 +55,7 @@ public class BranchDao {
         }
 
         String sql = """
-                DELETE FROM Branch\s
+                DELETE FROM "Branch"\s
                 WHERE repository_owner = ? AND repository_name = ? AND branch_name = ?
             """;
         jdbcTemplate.update(
@@ -67,7 +68,7 @@ public class BranchDao {
 
     @Transactional
     public List<Branch> findAll() {
-        String sql = "SELECT * FROM Branch";
+        String sql = "SELECT * FROM \"Branch\"";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
             new Branch(
                 rs.getLong("id"),
@@ -81,7 +82,7 @@ public class BranchDao {
 
     @Transactional
     public List<Branch> findAllByOwnerAndName(String owner, String name) {
-        String sql = "SELECT * FROM Branch WHERE repository_owner = ? AND repository_name = ?";
+        String sql = "SELECT * FROM \"Branch\" WHERE repository_owner = ? AND repository_name = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
             new Branch(
                 rs.getLong("id"),
