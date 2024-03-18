@@ -4,7 +4,6 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import edu.eflerrr.bot.command.list.CommandHandlerList;
 import edu.eflerrr.bot.command.list.impl.BotCommandHandlerList;
-import edu.eflerrr.bot.configuration.ApplicationConfig;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,60 +16,66 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class HelpCommandHandlerTest {
-    /*
     private final ApplicationContext context;
     private final Update update;
 
     public HelpCommandHandlerTest() {
-        var startCommandHandler = new StartCommandHandler(
-            mock(BotRepository.class)
-        );
-        var helpCommandHandler = new HelpCommandHandler(
-            mock(ApplicationContext.class)
-        );
-        var listCommandHandler = new ListCommandHandler(
-            mock(BotRepository.class)
-        );
-        var trackCommandHandler = new TrackCommandHandler(
-            mock(BotRepository.class),
-            mock(ApplicationConfig.class)
-        );
-        var untrackCommandHandler = new UntrackCommandHandler(
-            mock(BotRepository.class)
-        );
+        var startCommandHandler = mock(StartCommandHandler.class);
+        when(startCommandHandler.getCommandName()).thenReturn("/start");
+        when(startCommandHandler.getCommandDescription()).thenReturn("Зарегистрировать пользователя");
+        var helpCommandHandler = mock(HelpCommandHandler.class);
+        when(helpCommandHandler.getCommandName()).thenReturn("/help");
+        when(helpCommandHandler.getCommandDescription()).thenReturn("Вывести окно с командами");
+        var listCommandHandler = mock(ListCommandHandler.class);
+        when(listCommandHandler.getCommandName()).thenReturn("/list");
+        when(listCommandHandler.getCommandDescription()).thenReturn("Вывести список отслеживаемых ссылок");
+        var trackCommandHandler = mock(TrackCommandHandler.class);
+        when(trackCommandHandler.getCommandName()).thenReturn("/track");
+        when(trackCommandHandler.getCommandDescription()).thenReturn("Начать отслеживание ссылки");
+        var untrackCommandHandler = mock(UntrackCommandHandler.class);
+        when(untrackCommandHandler.getCommandName()).thenReturn("/untrack");
+        when(untrackCommandHandler.getCommandDescription()).thenReturn("Прекратить отслеживание ссылки");
+        var removeMeCommandHandler = mock(RemoveMeCommandHandler.class);
+        when(removeMeCommandHandler.getCommandName()).thenReturn("/remove_me");
+        when(removeMeCommandHandler.getCommandDescription()).thenReturn("Удалить свой аккаунт из базы данных");
+
         CommandHandlerList commands = new BotCommandHandlerList(
             startCommandHandler,
             helpCommandHandler,
             trackCommandHandler,
             untrackCommandHandler,
-            listCommandHandler
+            listCommandHandler,
+            removeMeCommandHandler
         );
+
         context = mock(ApplicationContext.class);
         when(context.getBean(CommandHandlerList.class)).thenReturn(commands);
+
         update = mock(Update.class);
         var message = mock(Message.class);
         when(update.message()).thenReturn(message);
         when(message.text()).thenReturn("/help");
     }
-    */
-//    @Nested
-//    class HandleTest {
-//        @Test
-//        public void allCommandsTest() {
-//            var helpCommandHandler = new HelpCommandHandler(context);
-//
-//            var actualAnswer = helpCommandHandler.handle(update);
-//
-//            var expectedAnswer = "*Список команд:*\n\n"
-//                + "*/start* \\-\\> _Зарегистрировать пользователя_\n"
-//                + "*/help* \\-\\> _Вывести окно с командами_\n"
-//                + "*/track* \\-\\> _Начать отслеживание ссылки_\n"
-//                + "*/untrack* \\-\\> _Прекратить отслеживание ссылки_\n"
-//                + "*/list* \\-\\> _Вывести список отслеживаемых ссылок_";
-//            assertThat(actualAnswer)
-//                .isEqualTo(expectedAnswer);
-//        }
-        /*
+
+    @Nested
+    class HandleTest {
+        @Test
+        public void allCommandsTest() {
+            var helpCommandHandler = new HelpCommandHandler(context);
+
+            var actualAnswer = helpCommandHandler.handle(update);
+
+            var expectedAnswer = "*Список команд:*\n\n"
+                + "*/start* \\-\\> _Зарегистрировать пользователя_\n"
+                + "*/help* \\-\\> _Вывести окно с командами_\n"
+                + "*/track* \\-\\> _Начать отслеживание ссылки_\n"
+                + "*/untrack* \\-\\> _Прекратить отслеживание ссылки_\n"
+                + "*/list* \\-\\> _Вывести список отслеживаемых ссылок_\n"
+                + "*/remove\\_me* \\-\\> _Удалить свой аккаунт из базы данных_";
+            assertThat(actualAnswer)
+                .isEqualTo(expectedAnswer);
+        }
+
         @Test
         public void emptyCommandsTest() {
             var emptyContext = mock(ApplicationContext.class);
@@ -146,5 +151,18 @@ class HelpCommandHandlerTest {
         assertThat(actualCheckResult)
             .isEqualTo(expectedCheckResult);
     }
-    */
+
+    @Test
+    public void toMarkdownStyleTest() {
+        var helpCommandHandler = new HelpCommandHandler(context);
+
+        String actualMarkdown = helpCommandHandler.toMarkdownStyle(
+            "The qu9ick br*wn f0x jumpe]d over the l+zy d()g!"
+        );
+
+        String expectedMarkdown = "The qu9ick br\\*wn f0x jumpe\\]d over the l\\+zy d\\(\\)g\\!";
+        assertThat(actualMarkdown)
+            .isEqualTo(expectedMarkdown);
+    }
+
 }

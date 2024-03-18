@@ -3,37 +3,31 @@ package edu.eflerrr.bot.command.handler.impl;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import edu.eflerrr.bot.client.ScrapperClient;
+import edu.eflerrr.bot.client.dto.response.LinkResponse;
+import edu.eflerrr.bot.client.dto.response.ListLinksResponse;
 import edu.eflerrr.bot.command.handler.CommandHandler;
-import org.junit.jupiter.api.BeforeEach;
+import edu.eflerrr.bot.exception.TgChatNotExistException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class ListCommandHandlerTest {
-    /*
-    private final Map<Long, List<URL>> memory;
     private final CommandHandler listCommandHandler;
+    private final ScrapperClient scrapperClient = mock(ScrapperClient.class);
     private final Update update;
 
     public ListCommandHandlerTest() {
-        this.memory = new HashMap<>();
-        BotRepository repository = new InMemoryBotRepository(memory);
-        this.listCommandHandler = new ListCommandHandler(repository);
+        this.listCommandHandler = new ListCommandHandler(scrapperClient);
         update = mock(Update.class);
         Message message = mock(Message.class);
         Chat chat = mock(Chat.class);
@@ -43,16 +37,13 @@ class ListCommandHandlerTest {
         when(chat.id()).thenReturn(1L);
     }
 
-    @BeforeEach
-    public void setUp() {
-        memory.clear();
-    }
-
     @Nested
     class HandleTest {
         @Test
         public void emptyListTest() {
-            memory.put(1L, List.of());
+            var ListLinksResponse = mock(ListLinksResponse.class);
+            when(ListLinksResponse.links()).thenReturn(List.of());
+            when(scrapperClient.listLinks(1L)).thenReturn(ListLinksResponse);
 
             String actualAnswer = listCommandHandler.handle(update);
 
@@ -63,24 +54,15 @@ class ListCommandHandlerTest {
 
         @Test
         public void filledListTest() {
-            List<String> stringUrls = List.of(
-                "http://hahaha.ru/api/3",
-                "https://alphabet.com/",
-                "https://example.com/helloworld/",
-                "https://example.com/helloworld/2",
-                "https://something.ua/user/Isdof$3ta#kfms@4"
-            );
-            List<URL> urls = stringUrls.stream()
-                .map(str -> {
-                    try {
-                        return new URI(str).toURL();
-                    } catch (URISyntaxException | MalformedURLException e) {
-                        fail("Runtime Exception while making urls from strings: " + e.getMessage());
-                    }
-                    return null;
-                })
-                .toList();
-            memory.put(1L, urls);
+            var ListLinksResponse = mock(ListLinksResponse.class);
+            when(ListLinksResponse.links()).thenReturn(List.of(
+                new LinkResponse(1L, URI.create("http://hahaha.ru/api/3")),
+                new LinkResponse(2L, URI.create("https://alphabet.com/")),
+                new LinkResponse(3L, URI.create("https://example.com/helloworld/")),
+                new LinkResponse(4L, URI.create("https://example.com/helloworld/2")),
+                new LinkResponse(5L, URI.create("https://something.ua/user/Isdof$3ta#kfms@4"))
+            ));
+            when(scrapperClient.listLinks(1L)).thenReturn(ListLinksResponse);
 
             String actualAnswer = listCommandHandler.handle(update);
 
@@ -96,32 +78,24 @@ class ListCommandHandlerTest {
 
         @Test
         public void severalFilledListTest() {
-            List<String> stringUrls = List.of(
-                "http://hahaha.ru/api/3",
-                "https://alphabet.com/",
-                "https://example.com/helloworld/",
-                "https://example.com/helloworld/2",
-                "https://something.ua/user/Isdof$3ta#kfms@4"
-            );
-            List<URL> urls = stringUrls.stream()
-                .map(str -> {
-                    try {
-                        return new URI(str).toURL();
-                    } catch (URISyntaxException | MalformedURLException e) {
-                        fail("Runtime Exception while making urls from strings: " + e.getMessage());
-                    }
-                    return null;
-                })
-                .toList();
-            memory.put(1L, urls);
-            List<URL> urls2 = new ArrayList<>(urls);
-            try {
-                urls2.add(new URI("http://www.hypex.ru/v1/go#").toURL());
-                urls2.add(new URI("https://goodbye.com/00/skdfhjb").toURL());
-            } catch (URISyntaxException | MalformedURLException e) {
-                fail("Runtime Exception while making urls from strings: " + e.getMessage());
-            }
-            memory.put(200L, urls2);
+            var links1 = new ArrayList<>(List.of(
+                new LinkResponse(1L, URI.create("http://hahaha.ru/api/3")),
+                new LinkResponse(2L, URI.create("https://alphabet.com/")),
+                new LinkResponse(3L, URI.create("https://example.com/helloworld/")),
+                new LinkResponse(4L, URI.create("https://example.com/helloworld/2")),
+                new LinkResponse(5L, URI.create("https://something.ua/user/Isdof$3ta#kfms@4"))
+            ));
+            var ListLinksResponse = mock(ListLinksResponse.class);
+            when(ListLinksResponse.links()).thenReturn(links1);
+            when(scrapperClient.listLinks(1L)).thenReturn(ListLinksResponse);
+
+            var links2 = new ArrayList<>(links1);
+            links2.add(new LinkResponse(6L, URI.create("http://www.hypex.ru/v1/go#")));
+            links2.add(new LinkResponse(7L, URI.create("https://goodbye.com/00/skdfhjb")));
+            var ListLinksResponse2 = mock(ListLinksResponse.class);
+            when(ListLinksResponse2.links()).thenReturn(links2);
+            when(scrapperClient.listLinks(200L)).thenReturn(ListLinksResponse2);
+
             var update2 = mock(Update.class);
             Message message2 = mock(Message.class);
             Chat chat2 = mock(Chat.class);
@@ -155,6 +129,8 @@ class ListCommandHandlerTest {
 
         @Test
         public void userNotFoundTest() {
+            doThrow(new TgChatNotExistException("Exception message")).when(scrapperClient).listLinks(1L);
+
             String actualAnswer = listCommandHandler.handle(update);
 
             String expectedAnswer = "Прости, не могу найти тебя в ___базе данных_\r"
@@ -218,23 +194,13 @@ class ListCommandHandlerTest {
 
     @Test
     public void urlsToMarkdownTest() {
-        List<String> stringUrls = List.of(
-            "http://hahaha.ru/api/~~=+_-23fdf&4nca",
-            "https://alphabet.com/",
-            "https://example.com/h.e.l.l.o.w.o.r.l.d/",
-            "https://example.com/hel!_loworld/2",
-            "https://something.ua/user/Isdof$3ta#kfms@4"
+        List<URI> urls = List.of(
+            URI.create("http://hahaha.ru/api/~~=+_-23fdf&4nca"),
+            URI.create("https://alphabet.com/"),
+            URI.create("https://example.com/h.e.l.l.o.w.o.r.l.d/"),
+            URI.create("https://example.com/hel!_loworld/2"),
+            URI.create("https://something.ua/user/Isdof$3ta#kfms@4")
         );
-        List<URL> urls = stringUrls.stream()
-            .map(str -> {
-                try {
-                    return new URI(str).toURL();
-                } catch (URISyntaxException | MalformedURLException e) {
-                    fail("Runtime Exception while making urls from strings: " + e.getMessage());
-                }
-                return null;
-            })
-            .toList();
 
         List<String> actualStringUrls = ((ListCommandHandler) listCommandHandler).urlsToMarkdown(urls);
 
@@ -248,5 +214,4 @@ class ListCommandHandlerTest {
         assertThat(actualStringUrls)
             .isEqualTo(expectedStringUrls);
     }
-    */
 }
