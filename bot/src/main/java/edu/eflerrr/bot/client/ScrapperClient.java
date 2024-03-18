@@ -11,9 +11,9 @@ import reactor.core.publisher.Mono;
 
 @SuppressWarnings("MemberName")
 public class ScrapperClient {
-    private final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
-    private final String TG_CHAT_ENDPOINT = "/tg-chat";
-    private final String LINKS_ENDPOINT = "/links";
+    private static final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
+    private static final String TG_CHAT_ENDPOINT = "/tg-chat";
+    private static final String LINKS_ENDPOINT = "/links";
     private final WebClient webClient;
     public final String defaultApiUrl = "localhost:8080";
 
