@@ -21,15 +21,15 @@ import static org.springframework.http.HttpStatus.OK;
 
 @SuppressWarnings("MemberName")
 public class ScrapperClient {
-    private final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
-    private final String TG_CHAT_ENDPOINT = "/tg-chat";
-    private final String LINKS_ENDPOINT = "/links";
+    private static final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
+    private static final String TG_CHAT_ENDPOINT = "/tg-chat";
+    private static final String LINKS_ENDPOINT = "/links";
     private final WebClient webClient;
-    private final String trackLinkErrorMessage =
+    private static final String trackLinkErrorMessage =
         "Error occurred during trackLink in ScrapperClient! ErrorResponse: ";
-    private final String untrackLinkErrorMessage =
+    private static final String untrackLinkErrorMessage =
         "Error occurred during untrackLink in ScrapperClient! ErrorResponse: ";
-    private final String listLinksErrorMessage =
+    private static final String listLinksErrorMessage =
         "Error occurred during listLinks in ScrapperClient! ErrorResponse: ";
     public final String defaultApiUrl = "http://localhost:8080";
 
