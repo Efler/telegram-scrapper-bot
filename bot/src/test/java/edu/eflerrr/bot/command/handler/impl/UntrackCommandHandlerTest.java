@@ -3,126 +3,101 @@ package edu.eflerrr.bot.command.handler.impl;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import java.net.MalformedURLException;
+import edu.eflerrr.bot.client.ScrapperClient;
+import edu.eflerrr.bot.client.dto.response.LinkResponse;
+import edu.eflerrr.bot.exception.LinkNotFoundException;
+import edu.eflerrr.bot.exception.TgChatNotExistException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import static edu.eflerrr.bot.message.BotMessage.UNTRACK_COMMAND_FORMAT_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.UNTRACK_COMMAND_SUCCESS;
+import static edu.eflerrr.bot.message.BotMessage.UNTRACK_COMMAND_URL_NOT_FOUND;
+import static edu.eflerrr.bot.message.BotMessage.URL_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.USER_NOT_FOUND_ERROR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class UntrackCommandHandlerTest {
-    /*
-    private final Map<Long, List<URL>> memory;
     private final UntrackCommandHandler untrackCommandHandler;
+    private final ScrapperClient scrapperClient = mock(ScrapperClient.class);
 
     public UntrackCommandHandlerTest() {
-        this.memory = new HashMap<>();
-        BotRepository repository = new InMemoryBotRepository(memory);
-        this.untrackCommandHandler = new UntrackCommandHandler(repository);
-    }
-
-    @BeforeEach
-    public void setUp() {
-        memory.clear();
+        this.untrackCommandHandler = new UntrackCommandHandler(scrapperClient);
     }
 
     @Nested
     class HandleTest {
         @Test
         public void successfulLinkCommandTest() {
-            try {
-                URL successfulUrl = new URI("https://stackoverflow.com/question/1234").toURL();
-                Update update = mock(Update.class);
-                Message message = mock(Message.class);
-                Chat chat = mock(Chat.class);
-                when(update.message()).thenReturn(message);
-                when(message.text()).thenReturn("/untrack " + successfulUrl);
-                when(message.chat()).thenReturn(chat);
-                when(chat.id()).thenReturn(1L);
-                memory.put(1L, List.of(
-                        new URI("https://github.com/java/src").toURL(),
-                        new URI("https://stackoverflow.com/question/1234").toURL(),
-                        new URI("https://example.ru/api/").toURL()
-                    )
-                );
+            when(scrapperClient.untrackLink(
+                1L, URI.create("https://stackoverflow.com/question/1234")
+            )).thenReturn(new LinkResponse(100L, URI.create("https://stackoverflow.com/question/1234")));
 
-                String actualAnswer = untrackCommandHandler.handle(update);
+            URI successfulUrl = URI.create("https://stackoverflow.com/question/1234");
+            Update update = mock(Update.class);
+            Message message = mock(Message.class);
+            Chat chat = mock(Chat.class);
+            when(update.message()).thenReturn(message);
+            when(message.text()).thenReturn("/untrack " + successfulUrl);
+            when(message.chat()).thenReturn(chat);
+            when(chat.id()).thenReturn(1L);
 
-                String expectedAnswer = "Ссылка ___успешно_\r__ удалена\\!";
-                assertThat(actualAnswer)
-                    .isEqualTo(expectedAnswer);
-            } catch (URISyntaxException | MalformedURLException e) {
-                fail("Runtime Exception while making urls from strings: " + e.getMessage());
-            }
+            String actualAnswer = untrackCommandHandler.handle(update);
+
+            assertThat(actualAnswer)
+                .isEqualTo(UNTRACK_COMMAND_SUCCESS);
         }
 
         @Test
         public void notFoundLinkCommandTest() {
-            try {
-                URL successfulUrl = new URI("https://stackoverflow.com/question/1234").toURL();
-                Update update = mock(Update.class);
-                Message message = mock(Message.class);
-                Chat chat = mock(Chat.class);
-                when(update.message()).thenReturn(message);
-                when(message.text()).thenReturn("/untrack " + successfulUrl);
-                when(message.chat()).thenReturn(chat);
-                when(chat.id()).thenReturn(1L);
-                memory.put(1L, List.of(
-                        new URI("https://github.com/java/src").toURL(),
-                        new URI("https://example.ru/api/").toURL()
-                    )
+            doThrow(new LinkNotFoundException("Link already exists!"))
+                .when(scrapperClient).untrackLink(
+                    1L, URI.create("https://stackoverflow.com/question/1234")
                 );
 
-                String actualAnswer = untrackCommandHandler.handle(update);
+            URI successfulUrl = URI.create("https://stackoverflow.com/question/1234");
+            Update update = mock(Update.class);
+            Message message = mock(Message.class);
+            Chat chat = mock(Chat.class);
+            when(update.message()).thenReturn(message);
+            when(message.text()).thenReturn("/untrack " + successfulUrl);
+            when(message.chat()).thenReturn(chat);
+            when(chat.id()).thenReturn(1L);
 
-                String expectedAnswer = "Не переживай, в твоем списке такой ссылки и так ___не было_\r__ :\\)";
-                assertThat(actualAnswer)
-                    .isEqualTo(expectedAnswer);
-            } catch (URISyntaxException | MalformedURLException e) {
-                fail("Runtime Exception while making urls from strings: " + e.getMessage());
-            }
+            String actualAnswer = untrackCommandHandler.handle(update);
+
+            assertThat(actualAnswer)
+                .isEqualTo(UNTRACK_COMMAND_URL_NOT_FOUND);
         }
 
         @Test
         public void userNotFoundTest() {
-            try {
-                URL successfulUrl = new URI("https://stackoverflow.com/question/1234").toURL();
-                Update update = mock(Update.class);
-                Message message = mock(Message.class);
-                Chat chat = mock(Chat.class);
-                when(update.message()).thenReturn(message);
-                when(message.text()).thenReturn("/untrack " + successfulUrl);
-                when(message.chat()).thenReturn(chat);
-                when(chat.id()).thenReturn(1L);
-                memory.put(2L, List.of(
-                        new URI("https://github.com/java/src").toURL(),
-                        new URI("https://stackoverflow.com/question/1234").toURL(),
-                        new URI("https://example.ru/api/").toURL()
-                    )
+            doThrow(new TgChatNotExistException("User not found!"))
+                .when(scrapperClient).untrackLink(
+                    1L, URI.create("https://stackoverflow.com/question/1234")
                 );
 
-                String actualAnswer = untrackCommandHandler.handle(update);
+            URI successfulUrl = URI.create("https://stackoverflow.com/question/1234");
+            Update update = mock(Update.class);
+            Message message = mock(Message.class);
+            Chat chat = mock(Chat.class);
+            when(update.message()).thenReturn(message);
+            when(message.text()).thenReturn("/untrack " + successfulUrl);
+            when(message.chat()).thenReturn(chat);
+            when(chat.id()).thenReturn(1L);
 
-                String expectedAnswer = "Прости, не могу найти тебя в ___базе данных_\r__\\! "
-                    + "Попробуйте начать с команды /start";
-                assertThat(actualAnswer)
-                    .isEqualTo(expectedAnswer);
-            } catch (URISyntaxException | MalformedURLException e) {
-                fail("Runtime Exception while making urls from strings: " + e.getMessage());
-            }
+            String actualAnswer = untrackCommandHandler.handle(update);
+
+            assertThat(actualAnswer)
+                .isEqualTo(USER_NOT_FOUND_ERROR);
         }
 
         public static Stream<String> invalidLinkCommandTestSource() {
@@ -144,9 +119,8 @@ class UntrackCommandHandlerTest {
 
             String actualAnswer = untrackCommandHandler.handle(invalidLinkUpdate);
 
-            String expectedAnswer = "Ой, вы передали ___некорректную_\r__ ссылку\\!";
             assertThat(actualAnswer)
-                .isEqualTo(expectedAnswer);
+                .isEqualTo(URL_ERROR);
         }
 
         @ParameterizedTest
@@ -162,10 +136,8 @@ class UntrackCommandHandlerTest {
 
             String actualAnswer = untrackCommandHandler.handle(emptyLinkUpdate);
 
-            String expectedAnswer = "Упс, похоже, что вы передали ___пустую_\r__ ссылку\\!\n"
-                + "Напишите её через ___пробел_\r__ после команды /untrack\\!";
             assertThat(actualAnswer)
-                .isEqualTo(expectedAnswer);
+                .isEqualTo(UNTRACK_COMMAND_FORMAT_ERROR);
         }
 
         @ParameterizedTest
@@ -225,5 +197,4 @@ class UntrackCommandHandlerTest {
         assertThat(actualCheckResult)
             .isEqualTo(expectedCheckResult);
     }
-    */
 }
