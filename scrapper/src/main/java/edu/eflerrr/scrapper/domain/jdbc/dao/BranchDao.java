@@ -19,11 +19,12 @@ public class BranchDao {
         String countSql = """
             SELECT COUNT(*) AS row_count\s
             FROM "Branch"\s
-            WHERE repository_owner = ? AND repository_name = ? AND branch_name = ?
+            WHERE link_id = ? AND repository_owner = ? AND repository_name = ? AND branch_name = ?
             """;
         var rowCount = jdbcTemplate.queryForObject(
             countSql,
             Integer.class,
+            branch.getLinkId(),
             branch.getRepositoryOwner(),
             branch.getRepositoryName(),
             branch.getBranchName()
@@ -33,11 +34,12 @@ public class BranchDao {
 
     public void add(Branch branch) {
         String sql = """
-            INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
-            VALUES (?, ?, ?, ?)
+            INSERT INTO "Branch" (link_id, repository_owner, repository_name, branch_name, last_commit_time)\s
+            VALUES (?, ?, ?, ?, ?)
             """;
         jdbcTemplate.update(
             sql,
+            branch.getLinkId(),
             branch.getRepositoryOwner(),
             branch.getRepositoryName(),
             branch.getBranchName(),
@@ -52,10 +54,11 @@ public class BranchDao {
 
         String sql = """
                 DELETE FROM "Branch"\s
-                WHERE repository_owner = ? AND repository_name = ? AND branch_name = ?
+                WHERE link_id = ? AND repository_owner = ? AND repository_name = ? AND branch_name = ?
             """;
         jdbcTemplate.update(
             sql,
+            branch.getLinkId(),
             branch.getRepositoryOwner(),
             branch.getRepositoryName(),
             branch.getBranchName()
@@ -67,6 +70,7 @@ public class BranchDao {
         return jdbcTemplate.query(sql, (rs, rowNum) ->
             new Branch(
                 rs.getLong("id"),
+                rs.getLong("link_id"),
                 rs.getString("repository_owner"),
                 rs.getString("repository_name"),
                 rs.getString("branch_name"),
@@ -80,11 +84,27 @@ public class BranchDao {
         return jdbcTemplate.query(sql, (rs, rowNum) ->
             new Branch(
                 rs.getLong("id"),
+                rs.getLong("link_id"),
                 rs.getString("repository_owner"),
                 rs.getString("repository_name"),
                 rs.getString("branch_name"),
                 rs.getObject("last_commit_time", OffsetDateTime.class)
             ), owner, name
+        );
+    }
+
+    @Transactional
+    public List<Branch> findAllByLinkId(Long linkId) {
+        String sql = "SELECT * FROM \"Branch\" WHERE link_id = ?";
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
+            new Branch(
+                rs.getLong("id"),
+                rs.getLong("link_id"),
+                rs.getString("repository_owner"),
+                rs.getString("repository_name"),
+                rs.getString("branch_name"),
+                rs.getObject("last_commit_time", OffsetDateTime.class)
+            ), linkId
         );
     }
 
