@@ -1,0 +1,1 @@
+TRUNCATE TABLE "Tracking" CASCADE;
