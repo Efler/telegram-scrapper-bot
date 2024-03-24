@@ -55,6 +55,13 @@ public class Keys {
     // FOREIGN KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final ForeignKey<BranchRecord, LinkRecord> CONSTRAINT_77 = Internal.createForeignKey(Branch.BRANCH,
+        DSL.name("CONSTRAINT_77"),
+        new TableField[] {Branch.BRANCH.LINK_ID},
+        Keys.CONSTRAINT_24,
+        new TableField[] {Link.LINK.ID},
+        true
+    );
     public static final ForeignKey<TrackingRecord, ChatRecord> CONSTRAINT_4F =
         Internal.createForeignKey(Tracking.TRACKING,
             DSL.name("CONSTRAINT_4F"),

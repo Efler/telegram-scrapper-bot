@@ -28,6 +28,7 @@ public class Branch implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Long id;
+    private Long linkId;
     private String repositoryOwner;
     private String repositoryName;
     private String branchName;
@@ -38,21 +39,24 @@ public class Branch implements Serializable {
 
     public Branch(Branch value) {
         this.id = value.id;
+        this.linkId = value.linkId;
         this.repositoryOwner = value.repositoryOwner;
         this.repositoryName = value.repositoryName;
         this.branchName = value.branchName;
         this.lastCommitTime = value.lastCommitTime;
     }
 
-    @ConstructorProperties({"id", "repositoryOwner", "repositoryName", "branchName", "lastCommitTime"})
+    @ConstructorProperties({"id", "linkId", "repositoryOwner", "repositoryName", "branchName", "lastCommitTime"})
     public Branch(
         @Nullable Long id,
+        @NotNull Long linkId,
         @NotNull String repositoryOwner,
         @NotNull String repositoryName,
         @NotNull String branchName,
         @NotNull OffsetDateTime lastCommitTime
     ) {
         this.id = id;
+        this.linkId = linkId;
         this.repositoryOwner = repositoryOwner;
         this.repositoryName = repositoryName;
         this.branchName = branchName;
@@ -72,6 +76,22 @@ public class Branch implements Serializable {
      */
     public void setId(@Nullable Long id) {
         this.id = id;
+    }
+
+    /**
+     * Getter for <code>Branch.link_id</code>.
+     */
+    @jakarta.validation.constraints.NotNull
+    @NotNull
+    public Long getLinkId() {
+        return this.linkId;
+    }
+
+    /**
+     * Setter for <code>Branch.link_id</code>.
+     */
+    public void setLinkId(@NotNull Long linkId) {
+        this.linkId = linkId;
     }
 
     /**
@@ -160,6 +180,13 @@ public class Branch implements Serializable {
         } else if (!this.id.equals(other.id)) {
             return false;
         }
+        if (this.linkId == null) {
+            if (other.linkId != null) {
+                return false;
+            }
+        } else if (!this.linkId.equals(other.linkId)) {
+            return false;
+        }
         if (this.repositoryOwner == null) {
             if (other.repositoryOwner != null) {
                 return false;
@@ -196,6 +223,7 @@ public class Branch implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((this.id == null) ? 0 : this.id.hashCode());
+        result = prime * result + ((this.linkId == null) ? 0 : this.linkId.hashCode());
         result = prime * result + ((this.repositoryOwner == null) ? 0 : this.repositoryOwner.hashCode());
         result = prime * result + ((this.repositoryName == null) ? 0 : this.repositoryName.hashCode());
         result = prime * result + ((this.branchName == null) ? 0 : this.branchName.hashCode());
@@ -208,6 +236,7 @@ public class Branch implements Serializable {
         StringBuilder sb = new StringBuilder("Branch (");
 
         sb.append(id);
+        sb.append(", ").append(linkId);
         sb.append(", ").append(repositoryOwner);
         sb.append(", ").append(repositoryName);
         sb.append(", ").append(branchName);
