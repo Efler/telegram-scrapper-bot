@@ -13,16 +13,18 @@ import lombok.ToString;
 public class Branch {
 
     private Long id;
+    private Long linkId;
     private String repositoryOwner;
     private String repositoryName;
     private String branchName;
     private OffsetDateTime lastCommitTime;
 
     public Branch(
-        String repositoryOwner, String repositoryName,
+        Long linkId, String repositoryOwner, String repositoryName,
         String branchName, OffsetDateTime lastCommitTime
     ) {
         this.id = null;
+        this.linkId = linkId;
         this.repositoryOwner = repositoryOwner;
         this.repositoryName = repositoryName;
         this.branchName = branchName;

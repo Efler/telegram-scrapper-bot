@@ -16,12 +16,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.jooq.Result;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.jooqcodegen.generated.Tables.BRANCH;
 import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
 import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
+import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.QUESTION_UNKNOWN_UPDATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_CREATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_DELETE;
@@ -29,8 +27,6 @@ import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_PUS
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_UPDATE;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 
-@Service
-@ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")
 @RequiredArgsConstructor
 @Slf4j
 public class JooqLinkUpdateService implements LinkUpdateService {
@@ -90,7 +86,8 @@ public class JooqLinkUpdateService implements LinkUpdateService {
 
             var dbBranches = new HashSet<>(dsl.select(BRANCH.BRANCH_NAME)
                 .from(BRANCH)
-                .where(BRANCH.REPOSITORY_OWNER.eq(username)
+                .where(BRANCH.LINK_ID.eq(linkRecord.getId())
+                    .and(BRANCH.REPOSITORY_OWNER.eq(username))
                     .and(BRANCH.REPOSITORY_NAME.eq(repository))
                 )
                 .fetchInto(String.class)
@@ -101,6 +98,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                     dbBranches.remove(branch.name());
                 } else {
                     dsl.insertInto(BRANCH)
+                        .set(BRANCH.LINK_ID, linkRecord.getId())
                         .set(BRANCH.REPOSITORY_OWNER, username)
                         .set(BRANCH.REPOSITORY_NAME, repository)
                         .set(BRANCH.BRANCH_NAME, branch.name())
@@ -124,7 +122,8 @@ public class JooqLinkUpdateService implements LinkUpdateService {
             if (!dbBranches.isEmpty()) {
                 for (var branchName : dbBranches) {
                     dsl.deleteFrom(BRANCH)
-                        .where(BRANCH.REPOSITORY_OWNER.eq(username)
+                        .where(BRANCH.LINK_ID.eq(linkRecord.getId())
+                            .and(BRANCH.REPOSITORY_OWNER.eq(username))
                             .and(BRANCH.REPOSITORY_NAME.eq(repository))
                             .and(BRANCH.BRANCH_NAME.eq(branchName))
                         )
