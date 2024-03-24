@@ -12,16 +12,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.jooqcodegen.generated.Tables.CHAT;
 import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
 import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 
-@Service
-@ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")
 @RequiredArgsConstructor
 @Slf4j
 public class JooqLinkService implements LinkService {
@@ -122,6 +118,7 @@ public class JooqLinkService implements LinkService {
     }
 
     @Override
+    @Transactional
     public List<Link> listAll(long tgChatId) {
         log.debug("LIST-ALL IN LINK-SERVICE (JOOQ): tgChatId: {}", tgChatId);
         if (!dsl.fetchExists(
