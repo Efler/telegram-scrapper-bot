@@ -118,6 +118,7 @@ public class JooqLinkService implements LinkService {
     }
 
     @Override
+    @Transactional
     public List<Link> listAll(long tgChatId) {
         log.debug("LIST-ALL IN LINK-SERVICE (JOOQ): tgChatId: {}", tgChatId);
         if (!dsl.fetchExists(
