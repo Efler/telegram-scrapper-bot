@@ -5,4 +5,6 @@
     "https://checkstyle.org/dtds/suppressions_1_2.dtd">
 
 <suppressions>
+    <suppress files="scrapper[/\\]src[/\\]main[/\\]java[/\\]
+    edu[/\\]eflerrr[/\\]scrapper[/\\]domain[/\\]jooq[/\\].*" checks=".*"/>
 </suppressions>
