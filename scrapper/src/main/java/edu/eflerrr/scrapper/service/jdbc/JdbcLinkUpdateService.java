@@ -19,8 +19,6 @@ import java.util.HashSet;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.QUESTION_UNKNOWN_UPDATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_CREATE;
@@ -29,8 +27,6 @@ import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_PUS
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_UPDATE;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 
-@Service
-@ConditionalOnProperty(value = "app.service.implementation", havingValue = "jdbc")
 @RequiredArgsConstructor
 @Slf4j
 public class JdbcLinkUpdateService implements LinkUpdateService {
@@ -60,7 +56,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
             );
             log.debug("LinkUpdateService: sending github update, link: {}, reason: repository update", url);
             botClient.sendUpdate(
-                REPOSITORY_UPDATE, link.getUrl(),
+                REPOSITORY_UPDATE, url,
                 "repository update -> " + response.getLastUpdate(),
                 tgChatIds
             );
@@ -75,7 +71,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
             );
             log.debug("LinkUpdateService: sending github update, link: {}, reason: repository push", url);
             botClient.sendUpdate(
-                REPOSITORY_PUSH, link.getUrl(),
+                REPOSITORY_PUSH, url,
                 "repository push -> " + response.getPushUpdate(),
                 tgChatIds
             );
@@ -91,7 +87,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                 dbBranches.remove(branch.name());
             } else {
                 branchDao.add(new Branch(
-                    username, repository, branch.name(), branch.lastCommitTime()
+                    link.getId(), username, repository, branch.name(), branch.lastCommitTime()
                 ));
                 if (!link.getCheckedAt().equals(MIN_DATE_TIME)) {
                     log.debug(
@@ -99,7 +95,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                         url, branch.name()
                     );
                     botClient.sendUpdate(
-                        REPOSITORY_BRANCH_CREATE, link.getUrl(),
+                        REPOSITORY_BRANCH_CREATE, url,
                         "new branch -> " + branch.name(),
                         new ArrayList<>(
                             trackingDao.findAllByLinkId(link.getId()).stream()
@@ -113,14 +109,14 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
         }
         if (!dbBranches.isEmpty()) {
             for (var branchName : dbBranches) {
-                branchDao.delete(new Branch(username, repository, branchName, null));
+                branchDao.delete(new Branch(link.getId(), username, repository, branchName, null));
                 if (!link.getCheckedAt().equals(MIN_DATE_TIME)) {
                     log.debug(
                         "LinkUpdateService: sending github update, link: {}, reason: branch deleted -> {}",
                         url, branchName
                     );
                     botClient.sendUpdate(
-                        REPOSITORY_BRANCH_DELETE, link.getUrl(),
+                        REPOSITORY_BRANCH_DELETE, url,
                         "branch deleted -> " + branchName,
                         new ArrayList<>(
                             trackingDao.findAllByLinkId(link.getId()).stream()
@@ -156,7 +152,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
             botClient.sendUpdate(
                 eventIds.getOrDefault(
                     response.events().getFirst().type(), QUESTION_UNKNOWN_UPDATE
-                ), link.getUrl(), response.events().getFirst().type(), tgChatIds
+                ), url, response.events().getFirst().type(), tgChatIds
             );
             linkDao.updateUpdatedAt(link, response.lastUpdate().withOffsetSameInstant(ZoneOffset.UTC));
             updateStatus = true;
