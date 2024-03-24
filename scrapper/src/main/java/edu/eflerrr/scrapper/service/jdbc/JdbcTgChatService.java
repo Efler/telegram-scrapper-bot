@@ -11,14 +11,10 @@ import edu.eflerrr.scrapper.service.TgChatService;
 import java.util.ArrayList;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
-@ConditionalOnProperty(value = "app.service.implementation", havingValue = "jdbc")
 @RequiredArgsConstructor
 @Slf4j
 public class JdbcTgChatService implements TgChatService {
