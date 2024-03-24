@@ -257,6 +257,7 @@
                             <exclude>edu/eflerrr/scrapper/controller/dto/**</exclude>
                             <exclude>edu/eflerrr/scrapper/domain/jdbc/dto/**</exclude>
                             <exclude>edu/eflerrr/scrapper/domain/jooq/**</exclude>
+                            <exclude>edu/eflerrr/scrapper/domain/jpa/**</exclude>
                             <exclude>edu/eflerrr/scrapper/exception/**</exclude>
                         </excludes>
                     </configuration>
