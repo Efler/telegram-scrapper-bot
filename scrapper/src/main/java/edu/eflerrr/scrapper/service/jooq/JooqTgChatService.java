@@ -8,16 +8,12 @@ import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.jooqcodegen.generated.Tables.CHAT;
 import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
 import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
 
-@Service
-@ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")
 @RequiredArgsConstructor
 @Slf4j
 public class JooqTgChatService implements TgChatService {
