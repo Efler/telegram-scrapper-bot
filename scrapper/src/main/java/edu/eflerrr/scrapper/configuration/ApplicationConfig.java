@@ -15,7 +15,7 @@ public record ApplicationConfig(
     @NotNull
     Scheduler scheduler,
     @NotNull
-    Service service
+    AccessType dataAccessType
 ) {
 
     public record Api(
@@ -34,10 +34,8 @@ public record ApplicationConfig(
     ) {
     }
 
-    public record Service(
-        @NotNull
-        String implementation
-    ) {
+    public enum AccessType {
+        JDBC, JOOQ, JPA
     }
 
 }
