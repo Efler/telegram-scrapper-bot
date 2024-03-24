@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -19,6 +18,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DirtiesContext
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(value = "classpath:scripts/clearLinkTable.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class LinkDaoTest extends IntegrationTest {
 
     @Autowired
@@ -42,11 +43,6 @@ class LinkDaoTest extends IntegrationTest {
 
     @Nested
     class AddTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void addOneLinkTest() throws URISyntaxException {
@@ -184,11 +180,6 @@ class LinkDaoTest extends IntegrationTest {
     @Nested
     class DeleteTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void deleteOneLinkTest() throws URISyntaxException {
             String sql = "INSERT INTO \"Link\" (url, created_at, checked_at, updated_at) VALUES (?, ?, ?, ?)";
@@ -269,11 +260,6 @@ class LinkDaoTest extends IntegrationTest {
     @Nested
     class FindAllTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void findAllEmptyTest() {
             var actualLinks = linkDao.findAll();
@@ -348,11 +334,6 @@ class LinkDaoTest extends IntegrationTest {
     @Nested
     class ExistsTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void existsLinkFalseTest() throws URISyntaxException {
             var link = new Link(new URI("https://this-is-the-way.com"), staticDateTime);
@@ -378,11 +359,6 @@ class LinkDaoTest extends IntegrationTest {
 
     @Nested
     class FindAllWithFilterTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void findAllWithFilterEmptyTest() {
@@ -438,11 +414,6 @@ class LinkDaoTest extends IntegrationTest {
     @Nested
     class getLinkByIdTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void getLinkByIdEmptyTest() {
             assertThatThrownBy(() -> linkDao.getLinkById(1L))
@@ -477,11 +448,6 @@ class LinkDaoTest extends IntegrationTest {
 
     @Nested
     class getIdTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void getIdEmptyTest() throws URISyntaxException {
@@ -518,11 +484,6 @@ class LinkDaoTest extends IntegrationTest {
 
     @Nested
     class UpdateCheckedAtTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void updateCheckedAtEmptyTest() throws URISyntaxException {
@@ -584,11 +545,6 @@ class LinkDaoTest extends IntegrationTest {
 
     @Nested
     class UpdateUpdatedAtTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void updateUpdatedAtEmptyTest() throws URISyntaxException {
