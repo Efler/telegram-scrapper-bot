@@ -3,7 +3,6 @@ package edu.eflerrr.scrapper.domain.jdbc.dao;
 import edu.eflerrr.scrapper.IntegrationTest;
 import edu.eflerrr.scrapper.domain.jdbc.dto.Tracking;
 import java.time.OffsetDateTime;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +22,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DirtiesContext
 @Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Sql(value = {
+    "classpath:scripts/clearChatTable.sql",
+    "classpath:scripts/clearLinkTable.sql",
+    "classpath:scripts/clearTrackingTable.sql"
+}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class TrackingDaoTest extends IntegrationTest {
 
     @Autowired
@@ -31,13 +36,6 @@ class TrackingDaoTest extends IntegrationTest {
 
     @Nested
     class AddTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void addOneTrackingTest() {
@@ -180,13 +178,6 @@ class TrackingDaoTest extends IntegrationTest {
     @Nested
     class DeleteTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void deleteOneTrackingTest() {
             String chatSql = "INSERT INTO \"Chat\" (id, username, created_at) VALUES (?, ?, ?)";
@@ -301,13 +292,6 @@ class TrackingDaoTest extends IntegrationTest {
     @Nested
     class FindAllTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void findAllEmptyTest() {
             var actualTrackings = trackingDao.findAll();
@@ -406,13 +390,6 @@ class TrackingDaoTest extends IntegrationTest {
     @Nested
     class ExistsTest {
 
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
-
         @Test
         public void existsTrackingFalseTest() {
             var tracking = new Tracking(1234L, 8L);
@@ -450,13 +427,6 @@ class TrackingDaoTest extends IntegrationTest {
 
     @Nested
     class FindAllByChatIdTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void findAllByChatIdEmptyTest() {
@@ -521,13 +491,6 @@ class TrackingDaoTest extends IntegrationTest {
 
     @Nested
     class FindAllByLinkIdTest {
-
-        @AfterEach
-        public void cleanUp() {
-            jdbcTemplate.update("DELETE FROM \"Tracking\"");
-            jdbcTemplate.update("DELETE FROM \"Chat\"");
-            jdbcTemplate.update("DELETE FROM \"Link\"");
-        }
 
         @Test
         public void findAllByLinkIdEmptyTest() {
