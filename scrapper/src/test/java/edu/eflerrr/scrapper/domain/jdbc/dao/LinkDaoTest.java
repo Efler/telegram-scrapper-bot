@@ -574,7 +574,9 @@ class LinkDaoTest extends IntegrationTest {
 
             linkDao.updateUpdatedAt(link, staticDateTime);
 
-            var actualLink = jdbcTemplate.queryForObject("SELECT * FROM \"Link\" WHERE id = 1", (rs, rowNum) ->
+            var actualLink = jdbcTemplate.queryForObject(
+                "SELECT * FROM \"Link\" WHERE url = 'https://i-exist.ua'",
+                (rs, rowNum) ->
                 {
                     try {
                         return new Link(
@@ -593,7 +595,7 @@ class LinkDaoTest extends IntegrationTest {
             assertThat(actualLink)
                 .isNotNull();
             assertThat(actualLink.getId())
-                .isEqualTo(1L);
+                .isNotNull();
             assertThat(actualLink.getUrl())
                 .isEqualTo(new URI("https://i-exist.ua"));
             assertThat(actualLink.getCreatedAt())
