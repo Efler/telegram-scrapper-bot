@@ -7,8 +7,7 @@ app:
     enable: false
     interval: 30s
     force-check-delay: 60s
-  service:
-    implementation: jooq
+  data-access-type: jpa
 
 spring:
   datasource:
@@ -20,6 +19,18 @@ spring:
     name: scrapper
   liquibase:
     enabled: false
+  jooq:
+    sql-dialect: POSTGRES
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        physical_naming_strategy: edu.eflerrr.scrapper.configuration.hibernate.CustomPhysicalNamingStrategy
+    show-sql: true
 
 springdoc:
   swagger-ui:
