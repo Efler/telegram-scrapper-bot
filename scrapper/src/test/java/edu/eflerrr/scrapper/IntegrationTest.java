@@ -46,23 +46,22 @@ public abstract class IntegrationTest {
             .getParent().getParent();
         changelogPath = changelogPath.resolve("migrations");
 
-        Connection connection = DriverManager.getConnection(
+        try (Connection connection = DriverManager.getConnection(
             c.getJdbcUrl(),
             c.getUsername(),
             c.getPassword()
-        );
-        Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
-            new JdbcConnection(connection)
-        );
+        )) {
+            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(
+                new JdbcConnection(connection)
+            );
 
-        Liquibase liquibase = new Liquibase(
-            "changelog-master.xml",
-            new DirectoryResourceAccessor(changelogPath),
-            database
-        );
-        liquibase.update(new Contexts(), new LabelExpression());
-
-        connection.close();
+            Liquibase liquibase = new Liquibase(
+                "changelog-master.xml",
+                new DirectoryResourceAccessor(changelogPath),
+                database
+            );
+            liquibase.update(new Contexts(), new LabelExpression());
+        }
     }
 
     @DynamicPropertySource
