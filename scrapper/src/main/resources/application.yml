@@ -8,6 +8,31 @@ app:
     interval: 30s
     force-check-delay: 60s
   data-access-type: jpa
+  retry:
+    bot-client:
+      enable: true
+      retry-status-codes:
+        - 500
+      backoff-policy: linear
+      max-attempts: -1
+      initial-interval: 2s
+      multiplier: 2.0
+    github-client:
+      enable: false
+      retry-status-codes:
+        - 403
+      backoff-policy: exponential
+      max-attempts: -1
+      initial-interval: 2s
+      multiplier: 2.0
+    stackoverflow-client:
+      enable: false
+      retry-status-codes:
+        - 403
+      backoff-policy: exponential
+      max-attempts: -1
+      initial-interval: 2s
+      multiplier: 2.0
 
 spring:
   datasource:
@@ -30,7 +55,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         physical_naming_strategy: edu.eflerrr.scrapper.configuration.hibernate.CustomPhysicalNamingStrategy
-    show-sql: true
+    show-sql: false
 
 springdoc:
   swagger-ui:
