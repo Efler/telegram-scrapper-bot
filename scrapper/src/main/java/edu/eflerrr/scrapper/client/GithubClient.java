@@ -1,36 +1,58 @@
 package edu.eflerrr.scrapper.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import edu.eflerrr.scrapper.client.customizer.GithubWebClientCustomizer;
 import edu.eflerrr.scrapper.client.dto.response.GithubBranchResponse;
 import edu.eflerrr.scrapper.client.dto.response.GithubClientResponse;
+import edu.eflerrr.scrapper.exception.retry.RetryableRequestException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-@Component
-@SuppressWarnings("MultipleStringLiterals")
+@RequiredArgsConstructor
+@SuppressWarnings({"MultipleStringLiterals", "ReturnCount"})
 public class GithubClient {
-    private final WebClient webClient;
 
-    @Autowired
-    public GithubClient(WebClient.Builder webClientBuilder, GithubWebClientCustomizer customizer) {
-        customizer.customize(webClientBuilder);
-        this.webClient = webClientBuilder.build();
+    private final WebClient webClient;
+    private final RetryTemplate retryTemplate;
+    private final Set<Integer> retryStatusCodes;
+
+    private GithubBranchResponse getBranchDataWithRetry(String username, String repository, String branchName) {
+        var branchJsonNode = (JsonNode) retryTemplate.execute(
+            context -> getBranchData(username, repository, branchName).block()
+        );
+        if (branchJsonNode == null) {
+            throw new RuntimeException(
+                "Error occurred during getBranchDataWithRetry in GithubClient! Message: empty response/data"
+            );
+        } else {
+            return new GithubBranchResponse(
+                branchJsonNode.get("name").asText(),
+                OffsetDateTime.parse(
+                    branchJsonNode.get("commit").get("commit").get("committer").get("date").asText(),
+                    DateTimeFormatter.ISO_OFFSET_DATE_TIME
+                )
+            );
+        }
     }
 
-    private GithubBranchResponse getBranchData(String username, String repository, String branchName) {
-        var branchJsonNode = webClient.get()
+    private Mono<JsonNode> getBranchData(String username, String repository, String branchName) {
+        return webClient.get()
             .uri(String.format("/repos/%s/%s/branches/%s", username, repository, branchName))
             .exchangeToMono(response -> {
                 HttpStatus status = (HttpStatus) response.statusCode();
+                if (retryStatusCodes.contains(status.value())) {
+                    return Mono.error(
+                        new RetryableRequestException("Retryable status code: " + status.value())
+                    );
+                }
                 if (status.is2xxSuccessful()) {
                     return response.bodyToMono(JsonNode.class);
                 } else if (status.is4xxClientError()) {
@@ -49,28 +71,37 @@ public class GithubClient {
                             + status.value() + " "
                             + status.getReasonPhrase()));
                 }
-            })
-            .block();
-        if (branchJsonNode == null) {
+            });
+    }
+
+    private List<String> getBranchNamesWithRetry(String username, String repository) {
+        var branchesJsonNodeArr = (JsonNode[]) retryTemplate.execute(
+            context -> getBranchNames(username, repository).block()
+        );
+        if (branchesJsonNodeArr == null) {
             throw new RuntimeException(
-                "Error occurred during getBranchData in GithubClient! Message: empty response/data"
+                "Error occurred during getBranchNamesWithRetry in GithubClient! Message: empty response/data"
             );
         } else {
-            return new GithubBranchResponse(
-                branchJsonNode.get("name").asText(),
-                OffsetDateTime.parse(
-                    branchJsonNode.get("commit").get("commit").get("committer").get("date").asText(),
-                    DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                )
+            return new ArrayList<>(
+                Stream.of(branchesJsonNodeArr)
+                    .map((x) -> x.get("name"))
+                    .map(JsonNode::asText)
+                    .toList()
             );
         }
     }
 
-    private List<String> getBranchNames(String username, String repository) {
-        var branchesJsonNodeArr = webClient.get()
+    private Mono<JsonNode[]> getBranchNames(String username, String repository) {
+        return webClient.get()
             .uri(String.format("/repos/%s/%s/branches", username, repository))
             .exchangeToMono(response -> {
                 HttpStatus status = (HttpStatus) response.statusCode();
+                if (retryStatusCodes.contains(status.value())) {
+                    return Mono.error(
+                        new RetryableRequestException("Retryable status code: " + status.value())
+                    );
+                }
                 if (status.is2xxSuccessful()) {
                     return response.bodyToMono(JsonNode[].class);
                 } else if (status.is4xxClientError()) {
@@ -89,27 +120,25 @@ public class GithubClient {
                             + status.value() + " "
                             + status.getReasonPhrase()));
                 }
-            })
-            .block();
-        if (branchesJsonNodeArr == null) {
-            throw new RuntimeException(
-                "Error occurred during getBranchNames in GithubClient! Message: empty response/data"
-            );
-        } else {
-            return new ArrayList<>(
-                Stream.of(branchesJsonNodeArr)
-                    .map((x) -> x.get("name"))
-                    .map(JsonNode::asText)
-                    .toList()
-            );
-        }
+            });
     }
 
-    public GithubClientResponse fetchResponse(String username, String repository) {
-        var githubResponse = webClient.get()
+    private GithubClientResponse fetchResponseWithRetry(String username, String repository) {
+        return retryTemplate.execute(
+            context -> getRepositoryData(username, repository).block()
+        );
+    }
+
+    private Mono<GithubClientResponse> getRepositoryData(String username, String repository) {
+        return webClient.get()
             .uri(String.format("/repos/%s/%s", username, repository))
             .exchangeToMono(response -> {
                 HttpStatus status = (HttpStatus) response.statusCode();
+                if (retryStatusCodes.contains(status.value())) {
+                    return Mono.error(
+                        new RetryableRequestException("Retryable status code: " + status.value())
+                    );
+                }
                 if (status.is2xxSuccessful()) {
                     return response.bodyToMono(GithubClientResponse.class);
                 } else if (status.is4xxClientError()) {
@@ -128,8 +157,12 @@ public class GithubClient {
                             + status.value() + " "
                             + status.getReasonPhrase()));
                 }
-            })
-            .block();
+            });
+    }
+
+    public GithubClientResponse fetchResponse(String username, String repository) {
+        var githubResponse = fetchResponseWithRetry(username, repository);
+
         if (githubResponse == null
             || githubResponse.getLastUpdate() == null
             || githubResponse.getPushUpdate() == null
@@ -139,10 +172,10 @@ public class GithubClient {
                 "Error occurred during fetchResponse in GithubClient! Message: empty response/data"
             );
         } else {
-            var branchNames = getBranchNames(username, repository);
+            var branchNames = getBranchNamesWithRetry(username, repository);
             var branchDataList = new ArrayList<GithubBranchResponse>();
             for (var branchName : branchNames) {
-                branchDataList.add(getBranchData(username, repository, branchName));
+                branchDataList.add(getBranchDataWithRetry(username, repository, branchName));
             }
             githubResponse.getBranches().addAll(branchDataList);
             return githubResponse;
