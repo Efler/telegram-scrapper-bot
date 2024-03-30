@@ -9,9 +9,11 @@ import edu.eflerrr.bot.exception.DuplicateRegistrationException;
 import edu.eflerrr.bot.exception.InvalidDataException;
 import edu.eflerrr.bot.exception.LinkNotFoundException;
 import edu.eflerrr.bot.exception.TgChatNotExistException;
+import edu.eflerrr.bot.exception.retry.RetryableRequestException;
 import java.net.URI;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Set;
 import org.springframework.http.HttpMethod;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
@@ -24,7 +26,7 @@ public class ScrapperClient {
     private static final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
     private static final String TG_CHAT_ENDPOINT = "/tg-chat";
     private static final String LINKS_ENDPOINT = "/links";
-    private final WebClient webClient;
+    private static final String RETRY_MESSAGE = "Retryable status code: ";
     private static final String TRACK_LINK_ERROR_MESSAGE =
         "Error occurred during trackLink in ScrapperClient! ErrorResponse: ";
     private static final String UNTRACK_LINK_ERROR_MESSAGE =
@@ -32,70 +34,124 @@ public class ScrapperClient {
     private static final String LIST_LINKS_ERROR_MESSAGE =
         "Error occurred during listLinks in ScrapperClient! ErrorResponse: ";
     public final String defaultApiUrl = "http://localhost:8080";
+    private final WebClient webClient;
+    private final RetryTemplate retryTemplate;
+    private final Set<Integer> retryStatusCodes;
 
-    public ScrapperClient(String baseApiUrl) {
+    public ScrapperClient(
+        String baseApiUrl, RetryTemplate retryTemplate, Set<Integer> retryStatusCodes
+    ) {
         this.webClient = WebClient.create(
             baseApiUrl == null || baseApiUrl.isEmpty()
                 ? defaultApiUrl
                 : baseApiUrl);
+        this.retryTemplate = retryTemplate;
+        this.retryStatusCodes = retryStatusCodes;
     }
 
     public void registerTgChat(Long id) {
-        AtomicInteger statusCode = new AtomicInteger();
-        var botResponse = webClient.post()
+        retryTemplate.execute(
+            context -> registerTgChatWebClientRequest(id).block()
+        );
+    }
+
+    private Mono<ScrapperErrorResponse> registerTgChatWebClientRequest(Long id) {
+        return webClient.post()
             .uri(TG_CHAT_ENDPOINT + "/" + id)
             .exchangeToMono(response -> {
+                if (retryStatusCodes.contains(response.statusCode().value())) {
+                    return Mono.error(
+                        new RetryableRequestException(
+                            RETRY_MESSAGE
+                                + response.statusCode().value())
+                    );
+                }
                 if (!response.statusCode().is2xxSuccessful()) {
-                    statusCode.set(response.statusCode().value());
-                    return response.bodyToMono(ScrapperErrorResponse.class);
+                    return response.bodyToMono(ScrapperErrorResponse.class)
+                        .flatMap(botResponse -> {
+                            if (response.statusCode().value() == (CONFLICT.value())) {
+                                return Mono.error(
+                                    new DuplicateRegistrationException(botResponse.description())
+                                );
+                            }
+                            if (response.statusCode().value() == (BAD_REQUEST.value())) {
+                                return Mono.error(
+                                    new InvalidDataException(botResponse.description())
+                                );
+                            }
+                            return Mono.error(
+                                new RuntimeException(
+                                    "Error occurred during registerTgChat in ScrapperClient! ErrorResponse: "
+                                        + botResponse
+                                )
+                            );
+                        });
                 }
                 return Mono.empty();
-            })
-            .block();
-        if (botResponse != null) {
-            if (statusCode.get() == (CONFLICT.value())) {
-                throw new DuplicateRegistrationException(botResponse.description());
-            }
-            if (statusCode.get() == (BAD_REQUEST.value())) {
-                throw new InvalidDataException(botResponse.description());
-            }
-            throw new RuntimeException(
-                "Error occurred during registerTgChat in ScrapperClient! ErrorResponse: " + botResponse
-            );
-        }
+            });
     }
 
     public void deleteTgChat(Long id) {
-        AtomicInteger statusCode = new AtomicInteger();
-        var botResponse = webClient.delete()
+        retryTemplate.execute(
+            context -> deleteTgChatWebClientRequest(id).block()
+        );
+    }
+
+    private Mono<ScrapperErrorResponse> deleteTgChatWebClientRequest(Long id) {
+        return webClient.delete()
             .uri(TG_CHAT_ENDPOINT + "/" + id)
             .exchangeToMono(response -> {
+                if (retryStatusCodes.contains(response.statusCode().value())) {
+                    return Mono.error(
+                        new RetryableRequestException(
+                            RETRY_MESSAGE
+                                + response.statusCode().value())
+                    );
+                }
                 if (!response.statusCode().is2xxSuccessful()) {
-                    statusCode.set(response.statusCode().value());
-                    return response.bodyToMono(ScrapperErrorResponse.class);
+                    return response.bodyToMono(ScrapperErrorResponse.class)
+                        .flatMap(botResponse -> {
+                            if (response.statusCode().value() == (NOT_FOUND.value())) {
+                                return Mono.error(
+                                    new TgChatNotExistException(botResponse.description())
+                                );
+                            }
+                            if (response.statusCode().value() == (BAD_REQUEST.value())) {
+                                return Mono.error(
+                                    new InvalidDataException(botResponse.description())
+                                );
+                            }
+                            return Mono.error(
+                                new RuntimeException(
+                                    "Error occurred during deleteTgChat in ScrapperClient! ErrorResponse: "
+                                        + botResponse
+                                )
+                            );
+                        });
                 }
                 return Mono.empty();
-            })
-            .block();
-        if (botResponse != null) {
-            if (statusCode.get() == (NOT_FOUND.value())) {
-                throw new TgChatNotExistException(botResponse.description());
-            }
-            if (statusCode.get() == (BAD_REQUEST.value())) {
-                throw new InvalidDataException(botResponse.description());
-            }
-            throw new RuntimeException(
-                "Error occurred during deleteTgChat in ScrapperClient! ErrorResponse: " + botResponse
-            );
-        }
+            });
     }
 
     public LinkResponse trackLink(Long id, URI url) {
+        return retryTemplate.execute(
+            context -> trackLinkWebClientRequest(id, url).block()
+        );
+    }
+
+    public Mono<LinkResponse> trackLinkWebClientRequest(Long id, URI url) {
         return webClient.post()
             .uri(LINKS_ENDPOINT)
             .header(TG_CHAT_ID_HEADER, id.toString())
             .bodyValue(new LinkRequest(url))
             .exchangeToMono(response -> {
+                if (retryStatusCodes.contains(response.statusCode().value())) {
+                    return Mono.error(
+                        new RetryableRequestException(
+                            RETRY_MESSAGE
+                                + response.statusCode().value())
+                    );
+                }
                 if (response.statusCode().equals(OK)) {
                     return response.bodyToMono(LinkResponse.class);
                 }
@@ -121,16 +177,28 @@ public class ScrapperClient {
                             TRACK_LINK_ERROR_MESSAGE + errorMessage
                         ));
                     });
-            })
-            .block();
+            });
     }
 
     public LinkResponse untrackLink(Long id, URI url) {
+        return retryTemplate.execute(
+            context -> untrackLinkWebClientRequest(id, url).block()
+        );
+    }
+
+    public Mono<LinkResponse> untrackLinkWebClientRequest(Long id, URI url) {
         return webClient.method(HttpMethod.DELETE)
             .uri(LINKS_ENDPOINT)
             .header(TG_CHAT_ID_HEADER, id.toString())
             .bodyValue(new LinkRequest(url))
             .exchangeToMono(response -> {
+                if (retryStatusCodes.contains(response.statusCode().value())) {
+                    return Mono.error(
+                        new RetryableRequestException(
+                            RETRY_MESSAGE
+                                + response.statusCode().value())
+                    );
+                }
                 if (response.statusCode().equals(OK)) {
                     return response.bodyToMono(LinkResponse.class);
                 }
@@ -157,15 +225,27 @@ public class ScrapperClient {
                             UNTRACK_LINK_ERROR_MESSAGE + errorMessage
                         ));
                     });
-            })
-            .block();
+            });
     }
 
     public ListLinksResponse listLinks(Long id) {
+        return retryTemplate.execute(
+            context -> listLinksWebClientRequest(id).block()
+        );
+    }
+
+    public Mono<ListLinksResponse> listLinksWebClientRequest(Long id) {
         return webClient.get()
             .uri(LINKS_ENDPOINT)
             .header(TG_CHAT_ID_HEADER, id.toString())
             .exchangeToMono(response -> {
+                if (retryStatusCodes.contains(response.statusCode().value())) {
+                    return Mono.error(
+                        new RetryableRequestException(
+                            RETRY_MESSAGE
+                                + response.statusCode().value())
+                    );
+                }
                 if (response.statusCode().equals(OK)) {
                     return response.bodyToMono(ListLinksResponse.class);
                 }
@@ -186,8 +266,7 @@ public class ScrapperClient {
                             LIST_LINKS_ERROR_MESSAGE + errorMessage
                         ));
                     });
-            })
-            .block();
+            });
     }
 
 }
