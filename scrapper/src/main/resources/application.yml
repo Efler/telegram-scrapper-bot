@@ -4,7 +4,7 @@ app:
     stackoverflow-base-url: https://api.stackexchange.com
     bot-base-url: http://localhost:8090
   scheduler:
-    enable: false
+    enable: true
     interval: 30s
     force-check-delay: 60s
   data-access-type: jpa
@@ -13,7 +13,7 @@ app:
       enable: true
       retry-status-codes:
         - 500
-      backoff-policy: linear
+      backoff-policy: constant
       max-attempts: -1
       initial-interval: 2s
       multiplier: 2.0
@@ -21,7 +21,7 @@ app:
       enable: false
       retry-status-codes:
         - 403
-      backoff-policy: exponential
+      backoff-policy: linear
       max-attempts: -1
       initial-interval: 2s
       multiplier: 2.0
@@ -29,12 +29,17 @@ app:
       enable: false
       retry-status-codes:
         - 403
-      backoff-policy: exponential
+      backoff-policy: linear
       max-attempts: -1
       initial-interval: 2s
       multiplier: 2.0
 
 spring:
+  cache:
+    cache-names:
+      - rate-limit-buckets
+    caffeine:
+      spec: maximumSize=100000,expireAfterAccess=3600s
   datasource:
     url: jdbc:postgresql://localhost:5432/scrapper
     username: postgres
@@ -56,6 +61,18 @@ spring:
         format_sql: true
         physical_naming_strategy: edu.eflerrr.scrapper.configuration.hibernate.CustomPhysicalNamingStrategy
     show-sql: false
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-buckets
+      url: .*
+      rate-limits:
+        - cache-key: "@securityService.getClientIP(#this)"
+          bandwidths:
+            - capacity: 5
+              time: 60
+              unit: seconds
 
 springdoc:
   swagger-ui:
