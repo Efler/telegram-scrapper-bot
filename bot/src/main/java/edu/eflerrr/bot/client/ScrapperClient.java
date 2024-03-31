@@ -13,6 +13,7 @@ import edu.eflerrr.bot.exception.retry.RetryableRequestException;
 import java.net.URI;
 import java.util.Set;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -33,6 +34,7 @@ public class ScrapperClient {
         "Error occurred during untrackLink in ScrapperClient! ErrorResponse: ";
     private static final String LIST_LINKS_ERROR_MESSAGE =
         "Error occurred during listLinks in ScrapperClient! ErrorResponse: ";
+    private static final String ERROR_MESSAGE_TEMPLATE = " - [%d %s] - ScrapperErrorResponse: ";
     public final String defaultApiUrl = "http://localhost:8080";
     private final WebClient webClient;
     private final RetryTemplate retryTemplate;
@@ -81,7 +83,12 @@ public class ScrapperClient {
                             }
                             return Mono.error(
                                 new RuntimeException(
-                                    "Error occurred during registerTgChat in ScrapperClient! ErrorResponse: "
+                                    "Error occurred during registerTgChat in ScrapperClient!"
+                                        + String.format(
+                                        ERROR_MESSAGE_TEMPLATE,
+                                        response.statusCode().value(),
+                                        ((HttpStatus) response.statusCode()).getReasonPhrase()
+                                    )
                                         + botResponse
                                 )
                             );
@@ -123,7 +130,12 @@ public class ScrapperClient {
                             }
                             return Mono.error(
                                 new RuntimeException(
-                                    "Error occurred during deleteTgChat in ScrapperClient! ErrorResponse: "
+                                    "Error occurred during deleteTgChat in ScrapperClient!"
+                                        + String.format(
+                                        ERROR_MESSAGE_TEMPLATE,
+                                        response.statusCode().value(),
+                                        ((HttpStatus) response.statusCode()).getReasonPhrase()
+                                    )
                                         + botResponse
                                 )
                             );
@@ -174,7 +186,13 @@ public class ScrapperClient {
                             ));
                         }
                         return Mono.error(new RuntimeException(
-                            TRACK_LINK_ERROR_MESSAGE + errorMessage
+                            TRACK_LINK_ERROR_MESSAGE
+                                + String.format(
+                                ERROR_MESSAGE_TEMPLATE,
+                                response.statusCode().value(),
+                                ((HttpStatus) response.statusCode()).getReasonPhrase()
+                            )
+                                + errorMessage
                         ));
                     });
             });
@@ -193,10 +211,9 @@ public class ScrapperClient {
             .bodyValue(new LinkRequest(url))
             .exchangeToMono(response -> {
                 if (retryStatusCodes.contains(response.statusCode().value())) {
-                    return Mono.error(
-                        new RetryableRequestException(
-                            RETRY_MESSAGE
-                                + response.statusCode().value())
+                    return Mono.error(new RetryableRequestException(
+                        RETRY_MESSAGE
+                            + response.statusCode().value())
                     );
                 }
                 if (response.statusCode().equals(OK)) {
@@ -222,7 +239,13 @@ public class ScrapperClient {
                             }
                         }
                         return Mono.error(new RuntimeException(
-                            UNTRACK_LINK_ERROR_MESSAGE + errorMessage
+                            UNTRACK_LINK_ERROR_MESSAGE
+                                + String.format(
+                                ERROR_MESSAGE_TEMPLATE,
+                                response.statusCode().value(),
+                                ((HttpStatus) response.statusCode()).getReasonPhrase()
+                            )
+                                + errorMessage
                         ));
                     });
             });
@@ -263,7 +286,13 @@ public class ScrapperClient {
                             ));
                         }
                         return Mono.error(new RuntimeException(
-                            LIST_LINKS_ERROR_MESSAGE + errorMessage
+                            LIST_LINKS_ERROR_MESSAGE
+                                + String.format(
+                                ERROR_MESSAGE_TEMPLATE,
+                                response.statusCode().value(),
+                                ((HttpStatus) response.statusCode()).getReasonPhrase()
+                            )
+                                + errorMessage
                         ));
                     });
             });
