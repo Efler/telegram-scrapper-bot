@@ -1,6 +1,9 @@
 ### todo-list for dev ###
 todo.txt
 
+### docker-volumes ###
+docker-volumes/
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
