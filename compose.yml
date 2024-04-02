@@ -1,4 +1,8 @@
 services:
+
+
+  # --- database ---
+
   postgresql:
     image: postgres:16
     ports:
@@ -11,6 +15,7 @@ services:
 #      - postgresql:/var/lib/postgresql/data
     networks:
       - backend
+
   liquibase-migrations:
     image: liquibase/liquibase:4.25
     depends_on:
@@ -27,8 +32,55 @@ services:
     networks:
       - backend
 
-#volumes:
+
+  # --- kafka ---
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    ports:
+      - "2181:2181"
+    volumes:
+      - "zookeeper-data:/bitnami"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+
+  broker:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - "broker-data:/bitnami"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://broker:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+    networks:
+      - backend
+
+
+volumes:
 #  postgresql: { }
+  zookeeper-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker-volumes/zookeeper-data
+  broker-data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker-volumes/broker-data
+
 
 networks:
   backend: { }
