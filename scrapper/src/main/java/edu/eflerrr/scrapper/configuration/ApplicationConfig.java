@@ -11,12 +11,16 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
 public record ApplicationConfig(
     @NotNull
+    boolean useQueue,
+    @NotNull
     Api api,
     @Bean
     @NotNull
     Scheduler scheduler,
     @NotNull
     AccessType dataAccessType,
+    @NotNull
+    Kafka kafka,
     @NotNull
     Retry retry
 ) {
@@ -39,6 +43,33 @@ public record ApplicationConfig(
 
     public enum AccessType {
         JDBC, JOOQ, JPA
+    }
+
+    public record Kafka(
+        @NotNull
+        String bootstrapServers,
+        @NotNull
+        Topic topic,
+        @NotNull
+        Producer producer
+    ) {
+        public record Topic(
+            @NotNull
+            String name,
+            @NotNull
+            int partitions,
+            @NotNull
+            short replicationFactor
+        ) {
+        }
+
+        public record Producer(
+            @NotNull
+            String clientId,
+            @NotNull
+            String acks
+        ) {
+        }
     }
 
     public record Retry(
