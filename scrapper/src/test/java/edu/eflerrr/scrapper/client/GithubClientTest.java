@@ -39,6 +39,7 @@ class GithubClientTest {
     public static void mockGithubBaseUrl(DynamicPropertyRegistry registry) {
         registry.add("app.api.github-base-url", wireMock::baseUrl);
         registry.add("app.retry.github-client.enable", () -> false);
+        registry.add("app.use-queue", () -> false);
     }
 
     private static final String TEST_REPO_RESPONSE_BODY = """
