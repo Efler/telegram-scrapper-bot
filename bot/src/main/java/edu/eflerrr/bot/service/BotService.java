@@ -10,6 +10,7 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import com.pengrad.telegrambot.response.BaseResponse;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.command.list.CommandHandlerList;
+import edu.eflerrr.bot.configuration.ApplicationConfig;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,11 +24,13 @@ import static edu.eflerrr.bot.message.BotMessage.UNKNOWN_COMMAND_ERROR;
 public class BotService {
     private final TelegramBot bot;
     private final List<CommandHandler> commandHandlers;
+    private final boolean ignoreIncomeUpdates;
 
     @Autowired
-    public BotService(TelegramBot bot, CommandHandlerList handlerList) {
+    public BotService(TelegramBot bot, CommandHandlerList handlerList, ApplicationConfig config) {
         this.bot = bot;
         this.commandHandlers = handlerList.getCommands();
+        this.ignoreIncomeUpdates = config.ignoreIncomeUpdates();
     }
 
     public SetMyCommands createMenu(List<CommandHandler> handlers) {
@@ -67,7 +70,11 @@ public class BotService {
 
         bot.setUpdatesListener(updates -> {
             for (var update : updates) {
-                bot.execute(handleUpdate(update));
+                if (!ignoreIncomeUpdates) {
+                    bot.execute(handleUpdate(update));
+                } else {
+                    log.warn("(!) Income update is ignored! Update: " + update.toString());
+                }
             }
             return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, ex -> {
