@@ -71,4 +71,9 @@ public abstract class IntegrationTest {
         registry.add("spring.datasource.password", POSTGRES::getPassword);
     }
 
+    @DynamicPropertySource
+    static void disableMessageQueue(DynamicPropertyRegistry registry) {
+        registry.add("app.use-queue", () -> false);
+    }
+
 }

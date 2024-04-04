@@ -85,9 +85,9 @@ class JpaLinkUpdateServiceTest extends IntegrationTest {
         this.config = config;
         this.eventId = eventId;
         jpaLinkUpdateService = new JpaLinkUpdateService(
+            botClient,
             branchRepository,
             linkRepository,
-            botClient,
             githubClient,
             stackoverflowClient,
             config,
