@@ -1,6 +1,5 @@
 package edu.eflerrr.scrapper.service.jdbc;
 
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
@@ -12,6 +11,7 @@ import edu.eflerrr.scrapper.domain.jdbc.dto.Link;
 import edu.eflerrr.scrapper.domain.jdbc.dto.Tracking;
 import edu.eflerrr.scrapper.exception.InvalidDataException;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 @Slf4j
 public class JdbcLinkUpdateService implements LinkUpdateService {
 
-    private final BotClient botClient;
+    private final UpdateSender updateSender;
     private final GithubClient githubClient;
     private final StackoverflowClient stackoverflowClient;
     private final LinkDao linkDao;
@@ -55,7 +55,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                     .toList()
             );
             log.debug("LinkUpdateService: sending github update, link: {}, reason: repository update", url);
-            botClient.sendUpdate(
+            updateSender.sendUpdate(
                 REPOSITORY_UPDATE, url,
                 "repository update -> " + response.getLastUpdate(),
                 tgChatIds
@@ -70,7 +70,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                     .toList()
             );
             log.debug("LinkUpdateService: sending github update, link: {}, reason: repository push", url);
-            botClient.sendUpdate(
+            updateSender.sendUpdate(
                 REPOSITORY_PUSH, url,
                 "repository push -> " + response.getPushUpdate(),
                 tgChatIds
@@ -94,7 +94,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                         "LinkUpdateService: sending github update, link: {}, reason: new branch -> {}",
                         url, branch.name()
                     );
-                    botClient.sendUpdate(
+                    updateSender.sendUpdate(
                         REPOSITORY_BRANCH_CREATE, url,
                         "new branch -> " + branch.name(),
                         new ArrayList<>(
@@ -115,7 +115,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                         "LinkUpdateService: sending github update, link: {}, reason: branch deleted -> {}",
                         url, branchName
                     );
-                    botClient.sendUpdate(
+                    updateSender.sendUpdate(
                         REPOSITORY_BRANCH_DELETE, url,
                         "branch deleted -> " + branchName,
                         new ArrayList<>(
@@ -149,7 +149,7 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
                 "LinkUpdateService: sending stackoverflow update, link: {}, type: {}",
                 url, response.events().getFirst().type()
             );
-            botClient.sendUpdate(
+            updateSender.sendUpdate(
                 eventIds.getOrDefault(
                     response.events().getFirst().type(), QUESTION_UNKNOWN_UPDATE
                 ), url, response.events().getFirst().type(), tgChatIds
