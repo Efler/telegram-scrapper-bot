@@ -17,6 +17,7 @@ import edu.eflerrr.bot.command.handler.impl.TrackCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.UntrackCommandHandler;
 import edu.eflerrr.bot.command.list.impl.BotCommandHandlerList;
 import java.util.List;
+import edu.eflerrr.bot.configuration.ApplicationConfig;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static edu.eflerrr.bot.message.BotMessage.GREETING;
@@ -61,7 +62,9 @@ class BotServiceTest {
 
         var commandHandlersList = mock(BotCommandHandlerList.class);
         when(commandHandlersList.getCommands()).thenReturn(handlers);
-        botService = new BotService(mock(TelegramBot.class), commandHandlersList);
+        var config = mock(ApplicationConfig.class);
+        when(config.ignoreIncomeUpdates()).thenReturn(false);
+        botService = new BotService(mock(TelegramBot.class), commandHandlersList, config);
     }
 
     @Test
