@@ -16,13 +16,56 @@ public record ApplicationConfig(
     @NotEmpty
     List<String> availableSites,
     @NotNull
+    boolean addQueue,
+    @NotNull
+    boolean ignoreIncomeUpdates,
+    @NotNull
     Api api,
+    @NotNull
+    Kafka kafka,
     @NotNull
     Retry retry
 ) {
     public record Api(
         String scrapperBaseUrl
     ) {
+    }
+
+    public record Kafka(
+        @NotNull
+        String bootstrapServers,
+        @NotNull
+        Topic topic,
+        @NotNull
+        Consumer consumer,
+        @NotNull
+        Dlq dlq
+    ) {
+        public record Topic(
+            @NotNull
+            String name
+        ) {
+        }
+
+        public record Consumer(
+            @NotNull
+            String clientId,
+            @NotNull
+            String groupId,
+            @NotNull
+            String autoOffsetReset
+        ) {
+        }
+
+        public record Dlq(
+            @NotNull
+            String dlqTopicName,
+            @NotNull
+            long backoffInterval,
+            @NotNull
+            int backoffMaxAttempts
+        ) {
+        }
     }
 
     public record Retry(
