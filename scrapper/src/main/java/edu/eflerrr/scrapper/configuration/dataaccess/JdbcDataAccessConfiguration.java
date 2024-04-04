@@ -1,6 +1,5 @@
 package edu.eflerrr.scrapper.configuration.dataaccess;
 
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
@@ -11,6 +10,7 @@ import edu.eflerrr.scrapper.domain.jdbc.dao.TrackingDao;
 import edu.eflerrr.scrapper.service.LinkService;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
 import edu.eflerrr.scrapper.service.TgChatService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import edu.eflerrr.scrapper.service.jdbc.JdbcLinkService;
 import edu.eflerrr.scrapper.service.jdbc.JdbcLinkUpdateService;
 import edu.eflerrr.scrapper.service.jdbc.JdbcTgChatService;
@@ -35,7 +35,7 @@ public class JdbcDataAccessConfiguration {
     @Bean
     @SuppressWarnings("ParameterNumber")
     public LinkUpdateService jdbcLinkUpdateServiceBean(
-        BotClient botClient,
+        UpdateSender updateSender,
         GithubClient githubClient,
         StackoverflowClient stackoverflowClient,
         LinkDao linkDao,
@@ -45,7 +45,7 @@ public class JdbcDataAccessConfiguration {
         Map<String, Long> eventIds
     ) {
         return new JdbcLinkUpdateService(
-            botClient,
+            updateSender,
             githubClient,
             stackoverflowClient,
             linkDao,
