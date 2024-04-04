@@ -1,6 +1,5 @@
 package edu.eflerrr.scrapper.configuration.dataaccess;
 
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
@@ -10,6 +9,7 @@ import edu.eflerrr.scrapper.domain.jpa.repository.LinkRepository;
 import edu.eflerrr.scrapper.service.LinkService;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
 import edu.eflerrr.scrapper.service.TgChatService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import edu.eflerrr.scrapper.service.jpa.JpaLinkService;
 import edu.eflerrr.scrapper.service.jpa.JpaLinkUpdateService;
 import edu.eflerrr.scrapper.service.jpa.JpaTgChatService;
@@ -34,16 +34,16 @@ public class JpaDataAccessConfiguration {
     public LinkUpdateService jpaLinkUpdateServiceBean(
         BranchRepository branchRepository,
         LinkRepository linkRepository,
-        BotClient botClient,
+        UpdateSender updateSender,
         GithubClient githubClient,
         StackoverflowClient stackoverflowClient,
         ApplicationConfig config,
         Map<String, Long> eventIds
     ) {
         return new JpaLinkUpdateService(
+            updateSender,
             branchRepository,
             linkRepository,
-            botClient,
             githubClient,
             stackoverflowClient,
             config,

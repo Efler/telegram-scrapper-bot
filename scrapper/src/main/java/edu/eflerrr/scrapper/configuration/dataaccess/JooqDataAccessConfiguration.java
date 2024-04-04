@@ -1,12 +1,12 @@
 package edu.eflerrr.scrapper.configuration.dataaccess;
 
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
 import edu.eflerrr.scrapper.service.LinkService;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
 import edu.eflerrr.scrapper.service.TgChatService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import edu.eflerrr.scrapper.service.jooq.JooqLinkService;
 import edu.eflerrr.scrapper.service.jooq.JooqLinkUpdateService;
 import edu.eflerrr.scrapper.service.jooq.JooqTgChatService;
@@ -27,7 +27,7 @@ public class JooqDataAccessConfiguration {
 
     @Bean
     public LinkUpdateService jooqLinkUpdateServiceBean(
-        BotClient botClient,
+        UpdateSender updateSender,
         GithubClient githubClient,
         StackoverflowClient stackoverflowClient,
         DSLContext dsl,
@@ -35,7 +35,7 @@ public class JooqDataAccessConfiguration {
         Map<String, Long> eventIds
     ) {
         return new JooqLinkUpdateService(
-            botClient,
+            updateSender,
             githubClient,
             stackoverflowClient,
             dsl,

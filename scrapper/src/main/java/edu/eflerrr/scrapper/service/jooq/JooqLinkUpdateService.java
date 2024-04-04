@@ -1,12 +1,12 @@
 package edu.eflerrr.scrapper.service.jooq;
 
 import edu.eflerrr.jooqcodegen.generated.tables.records.LinkRecord;
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
 import edu.eflerrr.scrapper.exception.InvalidDataException;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -31,7 +31,7 @@ import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 @Slf4j
 public class JooqLinkUpdateService implements LinkUpdateService {
 
-    private final BotClient botClient;
+    private final UpdateSender updateSender;
     private final GithubClient githubClient;
     private final StackoverflowClient stackoverflowClient;
     private final DSLContext dsl;
@@ -57,7 +57,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
 
             if (response.getLastUpdate().withOffsetSameInstant(ZoneOffset.UTC).isAfter(linkRecord.getUpdatedAt())) {
                 log.debug("LinkUpdateService: sending github update, link: {}, reason: repository update", url);
-                botClient.sendUpdate(
+                updateSender.sendUpdate(
                     REPOSITORY_UPDATE, url, "repository update -> " + response.getLastUpdate(), tgChatIds
                 );
                 dsl.update(LINK)
@@ -71,7 +71,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
             }
             if (response.getPushUpdate().withOffsetSameInstant(ZoneOffset.UTC).isAfter(linkRecord.getUpdatedAt())) {
                 log.debug("LinkUpdateService: sending github update, link: {}, reason: repository push", url);
-                botClient.sendUpdate(
+                updateSender.sendUpdate(
                     REPOSITORY_PUSH, url, "repository push -> " + response.getPushUpdate(), tgChatIds
                 );
                 dsl.update(LINK)
@@ -111,7 +111,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                             url,
                             branch.name()
                         );
-                        botClient.sendUpdate(
+                        updateSender.sendUpdate(
                             REPOSITORY_BRANCH_CREATE, url, "new branch -> " + branch.name(), tgChatIds
                         );
                         updateStatus = true;
@@ -133,7 +133,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                             "LinkUpdateService: sending github update, link: {}, reason: branch deleted -> {}",
                             url, branchName
                         );
-                        botClient.sendUpdate(
+                        updateSender.sendUpdate(
                             REPOSITORY_BRANCH_DELETE, url, "branch deleted -> " + branchName, tgChatIds
                         );
                         updateStatus = true;
@@ -162,7 +162,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                 "LinkUpdateService: sending stackoverflow update, link: {}, type: {}",
                 url, response.events().getFirst().type()
             );
-            botClient.sendUpdate(
+            updateSender.sendUpdate(
                 eventIds.getOrDefault(response.events().getFirst().type(), QUESTION_UNKNOWN_UPDATE),
                 url,
                 response.events().getFirst().type(),
