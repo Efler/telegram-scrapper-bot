@@ -3,8 +3,22 @@ app:
   available-sites:
     - github.com
     - stackoverflow.com
+  add-queue: true
+  ignore-income-updates: false
   api:
     scrapper-base-url: http://localhost:8080
+  kafka:
+    bootstrap-servers: localhost:9093
+    topic:
+      name: updates
+    consumer:
+      client-id: bot
+      group-id: telegram-bots
+      auto-offset-reset: latest
+    dlq:
+      dlq-topic-name: updates-dlq
+      backoff-interval: 1000
+      backoff-max-attempts: 2
   retry:
     scrapper-client:
       enable: true
