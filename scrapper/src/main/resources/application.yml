@@ -1,13 +1,23 @@
 app:
+  use-queue: true
   api:
     github-base-url: https://api.github.com
     stackoverflow-base-url: https://api.stackexchange.com
     bot-base-url: http://localhost:8090
   scheduler:
-    enable: true
+    enable: false
     interval: 30s
     force-check-delay: 60s
   data-access-type: jpa
+  kafka:
+    bootstrap-servers: localhost:9093
+    topic:
+      name: updates
+      partitions: 1
+      replication-factor: 1
+    producer:
+      client-id: scrapper
+      acks: 1
   retry:
     bot-client:
       enable: true
