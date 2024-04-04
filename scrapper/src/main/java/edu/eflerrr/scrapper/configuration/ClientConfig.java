@@ -10,6 +10,7 @@ import edu.eflerrr.scrapper.configuration.retry.ExponentialRetryTemplate;
 import edu.eflerrr.scrapper.configuration.retry.LinearRetryTemplate;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.support.RetryTemplate;
@@ -51,6 +52,7 @@ public class ClientConfig {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "app", name = "use-queue", havingValue = "false")
     public BotClient botClientBean() {
         var props = config.retry().botClient();
 

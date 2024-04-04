@@ -1,6 +1,5 @@
 package edu.eflerrr.scrapper.service.jpa;
 
-import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
@@ -11,6 +10,7 @@ import edu.eflerrr.scrapper.domain.jpa.repository.BranchRepository;
 import edu.eflerrr.scrapper.domain.jpa.repository.LinkRepository;
 import edu.eflerrr.scrapper.exception.InvalidDataException;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
+import edu.eflerrr.scrapper.service.UpdateSender;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -31,9 +31,9 @@ import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 @Slf4j
 public class JpaLinkUpdateService implements LinkUpdateService {
 
+    private final UpdateSender updateSender;
     private final BranchRepository branchRepository;
     private final LinkRepository linkRepository;
-    private final BotClient botClient;
     private final GithubClient githubClient;
     private final StackoverflowClient stackoverflowClient;
     private final ApplicationConfig config;
@@ -60,7 +60,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
 
             if (response.getLastUpdate().withOffsetSameInstant(ZoneOffset.UTC).isAfter(linkLastUpdateTime)) {
                 log.debug("LinkUpdateService (JPA): sending github update, link: {}, reason: repository update", url);
-                botClient.sendUpdate(
+                updateSender.sendUpdate(
                     REPOSITORY_UPDATE, url, "repository update -> " + response.getLastUpdate(), tgChatIds
                 );
                 link.setUpdatedAt(response.getLastUpdate().withOffsetSameInstant(ZoneOffset.UTC));
@@ -70,7 +70,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
 
             if (response.getPushUpdate().withOffsetSameInstant(ZoneOffset.UTC).isAfter(linkLastUpdateTime)) {
                 log.debug("LinkUpdateService (JPA): sending github update, link: {}, reason: repository push", url);
-                botClient.sendUpdate(
+                updateSender.sendUpdate(
                     REPOSITORY_PUSH, url, "repository push -> " + response.getPushUpdate(), tgChatIds
                 );
                 link.setUpdatedAt(response.getPushUpdate().withOffsetSameInstant(ZoneOffset.UTC));
@@ -100,7 +100,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
                             url,
                             branch.name()
                         );
-                        botClient.sendUpdate(
+                        updateSender.sendUpdate(
                             REPOSITORY_BRANCH_CREATE, url, "new branch -> " + branch.name(), tgChatIds
                         );
                         updateStatus = true;
@@ -117,7 +117,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
                         "LinkUpdateService (JPA): sending github update, link: {}, reason: branch deleted -> {}",
                         url, branchName
                     );
-                    botClient.sendUpdate(
+                    updateSender.sendUpdate(
                         REPOSITORY_BRANCH_DELETE, url, "branch deleted -> " + branchName, tgChatIds
                     );
                     updateStatus = true;
@@ -147,7 +147,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
                 "LinkUpdateService (JPA): sending stackoverflow update, link: {}, type: {}",
                 url, response.events().getFirst().type()
             );
-            botClient.sendUpdate(
+            updateSender.sendUpdate(
                 eventIds.getOrDefault(response.events().getFirst().type(), QUESTION_UNKNOWN_UPDATE),
                 url,
                 response.events().getFirst().type(),
