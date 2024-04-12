@@ -1,6 +1,9 @@
 ### todo-list for dev ###
 todo.txt
 
+### test-endpoints for dev ###
+test-endpoints.http
+
 ### docker-volumes ###
 docker-volumes/
 
