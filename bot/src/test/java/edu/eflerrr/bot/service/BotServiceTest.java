@@ -18,12 +18,14 @@ import edu.eflerrr.bot.command.handler.impl.UntrackCommandHandler;
 import edu.eflerrr.bot.command.list.impl.BotCommandHandlerList;
 import java.util.List;
 import edu.eflerrr.bot.configuration.ApplicationConfig;
+import edu.eflerrr.bot.metric.MessageCounter;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import static edu.eflerrr.bot.message.BotMessage.GREETING;
 import static edu.eflerrr.bot.message.BotMessage.UNKNOWN_COMMAND_ERROR;
 import static edu.eflerrr.bot.message.BotMessage.WELCOME_NEW_USER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +66,9 @@ class BotServiceTest {
         when(commandHandlersList.getCommands()).thenReturn(handlers);
         var config = mock(ApplicationConfig.class);
         when(config.ignoreIncomeUpdates()).thenReturn(false);
-        botService = new BotService(mock(TelegramBot.class), commandHandlersList, config);
+        var messageCounter = mock(MessageCounter.class);
+        doNothing().when(messageCounter).countMessage();
+        botService = new BotService(mock(TelegramBot.class), commandHandlersList, config, messageCounter);
     }
 
     @Test
