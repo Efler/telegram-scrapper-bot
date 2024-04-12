@@ -66,6 +66,31 @@ services:
       - backend
 
 
+  # --- metrics ---
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./metrics:/etc/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    ports:
+      - '3000:3000'
+    environment:
+      - GF_SECURITY_ADMIN_USER=grafana
+      - GF_SECURITY_ADMIN_PASSWORD=55555
+    depends_on:
+      - prometheus
+    networks:
+      - backend
+
 volumes:
 #  postgresql: { }
   zookeeper-data:
