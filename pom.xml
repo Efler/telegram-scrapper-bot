@@ -135,6 +135,20 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Metrics -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-tracing-bridge-brave</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -250,6 +264,7 @@
                             <exclude>edu/eflerrr/bot/controller/dto/**</exclude>
                             <exclude>edu/eflerrr/bot/exception/**</exclude>
                             <exclude>edu/eflerrr/bot/message/**</exclude>
+                            <exclude>edu/eflerrr/bot/metric/MessageCounter.java</exclude>
                             <exclude>edu/eflerrr/scrapper/advice/RestExceptionHandler.java</exclude>
                             <exclude>edu/eflerrr/scrapper/client/dto/**</exclude>
                             <exclude>edu/eflerrr/scrapper/client/customizer/**</exclude>
