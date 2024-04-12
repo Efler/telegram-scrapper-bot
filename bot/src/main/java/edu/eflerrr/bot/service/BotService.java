@@ -11,6 +11,7 @@ import com.pengrad.telegrambot.response.BaseResponse;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.command.list.CommandHandlerList;
 import edu.eflerrr.bot.configuration.ApplicationConfig;
+import edu.eflerrr.bot.metric.MessageCounter;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +26,19 @@ public class BotService {
     private final TelegramBot bot;
     private final List<CommandHandler> commandHandlers;
     private final boolean ignoreIncomeUpdates;
+    private final MessageCounter messageCounter;
 
     @Autowired
-    public BotService(TelegramBot bot, CommandHandlerList handlerList, ApplicationConfig config) {
+    public BotService(
+        TelegramBot bot,
+        CommandHandlerList handlerList,
+        ApplicationConfig config,
+        MessageCounter messageCounter
+    ) {
         this.bot = bot;
         this.commandHandlers = handlerList.getCommands();
         this.ignoreIncomeUpdates = config.ignoreIncomeUpdates();
+        this.messageCounter = messageCounter;
     }
 
     public SetMyCommands createMenu(List<CommandHandler> handlers) {
@@ -72,6 +80,7 @@ public class BotService {
             for (var update : updates) {
                 if (!ignoreIncomeUpdates) {
                     bot.execute(handleUpdate(update));
+                    messageCounter.countMessage();
                 } else {
                     log.warn("(!) Income update is ignored! Update: " + update.toString());
                 }
