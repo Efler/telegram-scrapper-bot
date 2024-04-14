@@ -9,6 +9,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
+  REPOSITORY_NAME: $(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
 
 jobs:
   build:
@@ -31,16 +32,8 @@ jobs:
       - name: maven build
         run: mvn -pl bot -am package
 
-      - name: Extract repository name
-        id: extract_repo_name
-        run: |
-          repo_full_name="${{ github.repository }}"
-          repo_name=$(basename $repo_full_name)
-          image_name="$repo_name/bot"
-          echo "IMAGE_NAME=$image_name" >> $GITHUB_ENV
-
       - name: Build bot Docker image
-        run: docker build -t ${{ env.REGISTRY }}/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/bot:latest .
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.REPOSITORY_NAME }}/bot:latest .
         working-directory: ${{ github.workspace }}/bot/
 
       - name: Log in to the Github Container registry
@@ -51,7 +44,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push bot Docker image to GitHub Container Registry
-        run: docker push ${{ env.REGISTRY }}/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/bot:latest
+        run: docker push ${{ env.REGISTRY }}/${{ env.REPOSITORY_NAME }}/bot:latest
 
       - id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
