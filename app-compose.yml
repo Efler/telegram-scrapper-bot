@@ -1,0 +1,25 @@
+services:
+
+  # --- scrapper ---
+
+  scrapper:
+    image: scrapper:latest
+    ports:
+      - "8080:8080"
+      - "12080:12080"
+    environment:
+      - SCHEDULER_ENABLE=false
+
+
+  # --- bot ---
+
+  bot:
+    image: bot:latest
+    ports:
+      - "8090:8090"
+      - "12090:12090"
+    environment:
+      - TOKEN=${token}
+      - IGNORE_INCOME_UPDATES=false
+    depends_on:
+      - scrapper
