@@ -12,9 +12,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.CHAT;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.LINK;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.TRACKING;
+import static edu.eflerrr.jooqcodegen.generated.Tables.CHAT;
+import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
+import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
 
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")

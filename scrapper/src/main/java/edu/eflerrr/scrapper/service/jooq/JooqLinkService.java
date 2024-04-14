@@ -15,10 +15,10 @@ import org.jooq.DSLContext;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static edu.eflerrr.jooqcodegen.generated.Tables.CHAT;
+import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
+import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.CHAT;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.LINK;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.TRACKING;
 
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")

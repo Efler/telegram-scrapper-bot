@@ -73,6 +73,13 @@
             <version>3.19.6</version>
         </dependency>
 
+        <!-- Jooq-generated code -->
+        <dependency>
+            <groupId>edu.eflerrr</groupId>
+            <artifactId>jooqcodegen</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
