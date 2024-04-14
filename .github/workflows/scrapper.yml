@@ -43,7 +43,7 @@ jobs:
           echo "IMAGE_NAME=$image_name" >> $GITHUB_ENV
 
       - name: Build scrapper Docker image
-        run: docker build -t ${{ env.IMAGE_NAME }}:latest .
+        run: docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest .
         working-directory: ${{ github.workspace }}/scrapper/
 
       - name: Log in to the Github Container registry
