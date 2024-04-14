@@ -38,9 +38,11 @@ jobs:
           repo_name=$(basename $repo_full_name)
           echo "Repository name: $repo_name"
           image_name="$repo_name/bot"
-          echo "::set-output name=image_name::$image_name"
-        env:
-          IMAGE_NAME: ${{ steps.extract_repo_name.outputs.image_name }}
+          echo "IMAGE_NAME=$image_name" >> $GITHUB_ENV
+
+      - name: Use image name
+        run: |
+          echo "Image name is $IMAGE_NAME"
 
       - name: Build bot Docker image
         run: docker build -t ${{ env.IMAGE_NAME }}:latest .
