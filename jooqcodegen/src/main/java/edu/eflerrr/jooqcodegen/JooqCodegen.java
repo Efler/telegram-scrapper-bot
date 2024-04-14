@@ -1,4 +1,4 @@
-package edu.eflerrr;
+package edu.eflerrr.jooqcodegen;
 
 import org.jooq.codegen.GenerationTool;
 import org.jooq.meta.jaxb.Configuration;
@@ -35,8 +35,8 @@ public class JooqCodegen {
             .withPojos(true);
 
         Target target = new Target()
-            .withPackageName("edu.eflerrr.scrapper.domain.jooq")
-            .withDirectory("scrapper/src/main/java");
+            .withPackageName("edu.eflerrr.jooqcodegen.generated")
+            .withDirectory("jooqcodegen/src/main/java");
 
         Configuration configuration = new Configuration()
             .withGenerator(

@@ -1,10 +1,10 @@
 package edu.eflerrr.scrapper.service.jooq;
 
+import edu.eflerrr.jooqcodegen.generated.tables.records.LinkRecord;
 import edu.eflerrr.scrapper.client.BotClient;
 import edu.eflerrr.scrapper.client.GithubClient;
 import edu.eflerrr.scrapper.client.StackoverflowClient;
 import edu.eflerrr.scrapper.configuration.ApplicationConfig;
-import edu.eflerrr.scrapper.domain.jooq.tables.records.LinkRecord;
 import edu.eflerrr.scrapper.exception.InvalidDataException;
 import edu.eflerrr.scrapper.service.LinkUpdateService;
 import java.net.URI;
@@ -18,15 +18,15 @@ import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import static edu.eflerrr.jooqcodegen.generated.Tables.BRANCH;
+import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
+import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.QUESTION_UNKNOWN_UPDATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_CREATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_DELETE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_PUSH;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_UPDATE;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.BRANCH;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.LINK;
-import static edu.eflerrr.scrapper.domain.jooq.Tables.TRACKING;
 
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jooq")
@@ -104,7 +104,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                         .set(BRANCH.BRANCH_NAME, branch.name())
                         .set(BRANCH.LAST_COMMIT_TIME, branch.lastCommitTime())
                         .execute();
-                    if (!linkRecord.getCheckedAt().equals(MIN_DATE_TIME)
+                    if (!linkRecord.getCheckedAt().withOffsetSameInstant(ZoneOffset.UTC).equals(MIN_DATE_TIME)
                     ) {
                         log.debug(
                             "LinkUpdateService: sending github update, link: {}, reason: new branch -> {}",
@@ -127,7 +127,7 @@ public class JooqLinkUpdateService implements LinkUpdateService {
                             .and(BRANCH.BRANCH_NAME.eq(branchName))
                         )
                         .execute();
-                    if (!linkRecord.getCheckedAt().equals(MIN_DATE_TIME)) {
+                    if (!linkRecord.getCheckedAt().withOffsetSameInstant(ZoneOffset.UTC).equals(MIN_DATE_TIME)) {
                         log.debug(
                             "LinkUpdateService: sending github update, link: {}, reason: branch deleted -> {}",
                             url, branchName
