@@ -9,7 +9,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/scrapper
 
 jobs:
   build:
@@ -35,6 +34,17 @@ jobs:
       - name: maven build
         run: mvn -pl scrapper -am package
 
+      - name: Extract repository name
+        id: extract_repo_name
+        run: |
+          repo_full_name="${{ github.repository }}"
+          repo_name=$(basename $repo_full_name)
+          echo "Repository name: $repo_name"
+          image_name="$repo_name/scrapper"
+          echo "::set-output name=image_name::$image_name"
+        env:
+          IMAGE_NAME: ${{ steps.extract_repo_name.outputs.image_name }}
+
       - name: Build scrapper Docker image
         run: docker build -t ${{ env.IMAGE_NAME }}:latest .
         working-directory: ${{ github.workspace }}/scrapper/
@@ -47,7 +57,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push scrapper Docker image to GitHub Container Registry
-        run: docker push ${{ env.REGISTRY }}/${{ github.actor }}/${{ env.IMAGE_NAME }}:latest
+        run: docker push ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
 
       - id: jacoco
         uses: madrapps/jacoco-report@v1.6.1
