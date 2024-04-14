@@ -4,7 +4,7 @@ app:
     - github.com
     - stackoverflow.com
   add-queue: true
-  ignore-income-updates: ${ignore_income_updates}
+  ignore-income-updates: ${ignore_income_updates:false}
   api:
     scrapper-base-url: http://host.docker.internal:8080
   kafka:
