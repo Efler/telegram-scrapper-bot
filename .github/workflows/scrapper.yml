@@ -25,6 +25,9 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: install jooqcodegen locally
+        run: mvn install -DskipTests -f ./jooqcodegen/pom.xml
+
       - name: maven build
         run: mvn -pl scrapper -am package
 
@@ -64,5 +67,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+
+      - name: install jooqcodegen locally
+        run: mvn install -DskipTests -f ./jooqcodegen/pom.xml
 
       - run: mvn -pl scrapper -am verify -Dskip.unit.tests=true
