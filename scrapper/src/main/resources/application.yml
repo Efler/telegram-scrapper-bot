@@ -5,7 +5,7 @@ app:
     stackoverflow-base-url: https://api.stackexchange.com
     bot-base-url: https://host.docker.internal:8090
   scheduler:
-    enable: ${scheduler_enable}
+    enable: ${scheduler_enable:true}
     interval: 30s
     force-check-delay: 60s
   data-access-type: jpa
