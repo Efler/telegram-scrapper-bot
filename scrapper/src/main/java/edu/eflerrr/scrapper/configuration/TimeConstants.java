@@ -1,6 +1,8 @@
 package edu.eflerrr.scrapper.configuration;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +10,8 @@ import lombok.NoArgsConstructor;
 public final class TimeConstants {
 
     public final static OffsetDateTime MIN_DATE_TIME =
-        OffsetDateTime.parse("0001-01-01T00:00:00Z");
+        OffsetDateTime.now()
+            .withOffsetSameInstant(ZoneOffset.UTC)
+            .truncatedTo(ChronoUnit.MICROS);
 
 }
