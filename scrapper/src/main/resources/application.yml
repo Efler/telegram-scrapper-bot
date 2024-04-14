@@ -3,14 +3,14 @@ app:
   api:
     github-base-url: https://api.github.com
     stackoverflow-base-url: https://api.stackexchange.com
-    bot-base-url: http://localhost:8090
+    bot-base-url: https://host.docker.internal:8090
   scheduler:
-    enable: false
+    enable: ${scheduler_enable}
     interval: 30s
     force-check-delay: 60s
   data-access-type: jpa
   kafka:
-    bootstrap-servers: localhost:9093
+    bootstrap-servers: host.docker.internal:9093
     topic:
       name: updates
       partitions: 1
@@ -51,7 +51,7 @@ spring:
     caffeine:
       spec: maximumSize=100000,expireAfterAccess=3600s
   datasource:
-    url: jdbc:postgresql://localhost:5432/scrapper
+    url: jdbc:postgresql://host.docker.internal:5432/scrapper
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
