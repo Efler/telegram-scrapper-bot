@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -15,14 +14,12 @@ public class TrackingDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Transactional
     public boolean exists(Tracking tracking) {
         String countSql = "SELECT COUNT(*) AS row_count FROM \"Tracking\" WHERE chat_id = ? AND link_id = ?";
         var rowCount = jdbcTemplate.queryForObject(countSql, Integer.class, tracking.getChatId(), tracking.getLinkId());
         return rowCount != null && rowCount == 1;
     }
 
-    @Transactional
     public void add(Tracking tracking) {
         if (exists(tracking)) {
             throw new InvalidDataAccessResourceUsageException("Tracking already exists!");
@@ -32,7 +29,6 @@ public class TrackingDao {
         jdbcTemplate.update(sql, tracking.getChatId(), tracking.getLinkId());
     }
 
-    @Transactional
     public void delete(Tracking tracking) {
         if (!exists(tracking)) {
             throw new InvalidDataAccessResourceUsageException("Tracking not found!");
@@ -42,7 +38,6 @@ public class TrackingDao {
         jdbcTemplate.update(sql, tracking.getChatId(), tracking.getLinkId());
     }
 
-    @Transactional
     public List<Tracking> findAll() {
         String sql = "SELECT * FROM \"Tracking\"";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -54,7 +49,6 @@ public class TrackingDao {
         );
     }
 
-    @Transactional
     public List<Tracking> findAllByChatId(Long chatId) {
         String sql = "SELECT * FROM \"Tracking\" WHERE chat_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -66,7 +60,6 @@ public class TrackingDao {
         );
     }
 
-    @Transactional
     public List<Tracking> findAllByLinkId(Long linkId) {
         String sql = "SELECT * FROM \"Tracking\" WHERE link_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
