@@ -80,6 +80,7 @@ public class JooqLinkService implements LinkService {
     }
 
     @Override
+    @Transactional
     public Link delete(long tgChatId, URI url) {
         log.debug("DELETE IN LINK-SERVICE (JOOQ): tgChatId: {}, url: {}", tgChatId, url);
         Long linkId = dsl.select(LINK.ID)

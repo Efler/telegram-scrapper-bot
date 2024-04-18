@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jdbc")
@@ -28,6 +29,7 @@ public class JdbcTgChatService implements TgChatService {
     private final String autoUsernamePrefix = "auto-username@";
 
     @Override
+    @Transactional
     public void register(long tgChatId) {
         log.debug("REGISTER IN TG-CHAT-SERVICE (JDBC): tgChatId: {}", tgChatId);
         try {
@@ -40,6 +42,7 @@ public class JdbcTgChatService implements TgChatService {
     }
 
     @Override
+    @Transactional
     public void unregister(long tgChatId) {
         log.debug("UNREGISTER IN TG-CHAT-SERVICE (JDBC): tgChatId: {}", tgChatId);
         try {
