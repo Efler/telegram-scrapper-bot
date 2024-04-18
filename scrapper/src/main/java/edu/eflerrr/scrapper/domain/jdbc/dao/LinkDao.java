@@ -12,7 +12,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ public class LinkDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Transactional
     public boolean exists(Link link) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
@@ -31,7 +29,6 @@ public class LinkDao {
         return rowCount != null && rowCount == 1;
     }
 
-    @Transactional
     public Long getId(Link link) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
@@ -44,7 +41,6 @@ public class LinkDao {
         }
     }
 
-    @Transactional
     public Link getLinkById(long id) {
         String sql = "SELECT * FROM \"Link\" WHERE id = ?";
         var linkList = jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -68,7 +64,6 @@ public class LinkDao {
         }
     }
 
-    @Transactional
     public void add(Link link) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
@@ -82,7 +77,6 @@ public class LinkDao {
         );
     }
 
-    @Transactional
     public void delete(Link link) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
@@ -95,7 +89,6 @@ public class LinkDao {
         jdbcTemplate.update(sql, link.getUrl().toString());
     }
 
-    @Transactional
     public List<Link> findAll() {
         String sql = "SELECT * FROM \"Link\"";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -114,7 +107,6 @@ public class LinkDao {
         );
     }
 
-    @Transactional
     public List<Link> findAllWithFilter(Duration duration, OffsetDateTime currentTime) {
         String filterSql =
             "SELECT * FROM \"Link\" WHERE checked_at < (? - INTERVAL '" + duration.toSeconds() + " seconds')";
@@ -134,7 +126,6 @@ public class LinkDao {
         );
     }
 
-    @Transactional
     public void updateCheckedAt(Link link, OffsetDateTime newCheckedAt) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
@@ -147,7 +138,6 @@ public class LinkDao {
         jdbcTemplate.update(sql, newCheckedAt.withOffsetSameInstant(ZoneOffset.UTC), link.getUrl().toString());
     }
 
-    @Transactional
     public void updateUpdatedAt(Link link, OffsetDateTime newUpdatedAt) {
         if (link == null || link.getUrl() == null) {
             throw new NullPointerException("Link or URL is null!");
