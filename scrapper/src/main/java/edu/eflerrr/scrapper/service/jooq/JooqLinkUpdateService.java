@@ -18,6 +18,7 @@ import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.jooqcodegen.generated.Tables.BRANCH;
 import static edu.eflerrr.jooqcodegen.generated.Tables.LINK;
 import static edu.eflerrr.jooqcodegen.generated.Tables.TRACKING;
@@ -41,7 +42,8 @@ public class JooqLinkUpdateService implements LinkUpdateService {
     private final ApplicationConfig config;
     private final Map<String, Long> eventIds;
 
-    private boolean checkGithubUrl(LinkRecord linkRecord) {
+    @Transactional
+    protected boolean checkGithubUrl(LinkRecord linkRecord) {
         var updateStatus = false;
         var url = URI.create(linkRecord.getUrl());
         var username = url.getPath().split("/")[1];
@@ -144,7 +146,8 @@ public class JooqLinkUpdateService implements LinkUpdateService {
         return updateStatus;
     }
 
-    private boolean checkStackoverflowUrl(LinkRecord linkRecord) {
+    @Transactional
+    protected boolean checkStackoverflowUrl(LinkRecord linkRecord) {
         var updateStatus = false;
         var url = URI.create(linkRecord.getUrl());
         var questionId = Long.parseLong(url.getPath().split("/")[2]);
