@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,7 +15,6 @@ public class BranchDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Transactional
     public boolean exists(Branch branch) {
         String countSql = """
             SELECT COUNT(*) AS row_count\s
@@ -33,7 +31,6 @@ public class BranchDao {
         return rowCount != null && rowCount == 1;
     }
 
-    @Transactional
     public void add(Branch branch) {
         String sql = """
             INSERT INTO "Branch" (repository_owner, repository_name, branch_name, last_commit_time)\s
@@ -48,7 +45,6 @@ public class BranchDao {
         );
     }
 
-    @Transactional
     public void delete(Branch branch) {
         if (!exists(branch)) {
             throw new InvalidDataAccessResourceUsageException("Branch not found!");
@@ -66,7 +62,6 @@ public class BranchDao {
         );
     }
 
-    @Transactional
     public List<Branch> findAll() {
         String sql = "SELECT * FROM \"Branch\"";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -80,7 +75,6 @@ public class BranchDao {
         );
     }
 
-    @Transactional
     public List<Branch> findAllByOwnerAndName(String owner, String name) {
         String sql = "SELECT * FROM \"Branch\" WHERE repository_owner = ? AND repository_name = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
