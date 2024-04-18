@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.QUESTION_UNKNOWN_UPDATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_CREATE;
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_BRANCH_DELETE;
@@ -43,7 +44,8 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
     private final ApplicationConfig config;
     private final Map<String, Long> eventIds;
 
-    private boolean checkGithubUrl(Link link) {
+    @Transactional
+    protected boolean checkGithubUrl(Link link) {
         var updateStatus = false;
         var url = link.getUrl();
         var username = url.getPath().split("/")[1];
@@ -133,7 +135,8 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
         return updateStatus;
     }
 
-    private boolean checkStackoverflowUrl(Link link) {
+    @Transactional
+    protected boolean checkStackoverflowUrl(Link link) {
         var updateStatus = false;
         var url = link.getUrl();
         var questionId = Long.parseLong(url.getPath().split("/")[2]);

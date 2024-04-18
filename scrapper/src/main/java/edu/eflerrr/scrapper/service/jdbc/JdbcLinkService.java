@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @ConditionalOnProperty(value = "app.service.implementation", havingValue = "jdbc")
@@ -32,6 +33,7 @@ public class JdbcLinkService implements LinkService {
     private final String chatNotFoundErrorMessage = "Chat not found!";
 
     @Override
+    @Transactional
     public Link add(long tgChatId, URI url) {
         log.debug("ADD IN LINK-SERVICE (JDBC): tgChatId: {}, url: {}", tgChatId, url);
         if (!chatDao.exists(
@@ -57,6 +59,7 @@ public class JdbcLinkService implements LinkService {
     }
 
     @Override
+    @Transactional
     public Link delete(long tgChatId, URI url) {
         log.debug("DELETE IN LINK-SERVICE (JDBC): tgChatId: {}, url: {}", tgChatId, url);
         var link = new Link(url);
