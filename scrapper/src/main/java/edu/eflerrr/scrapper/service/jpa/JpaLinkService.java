@@ -85,7 +85,6 @@ public class JpaLinkService implements LinkService {
     }
 
     @Override
-    @Transactional
     public List<edu.eflerrr.scrapper.domain.jdbc.dto.Link> listAll(long tgChatId) {
         log.debug("LIST-ALL IN LINK-SERVICE (JPA): tgChatId: {}", tgChatId);
         Chat chat = chatRepository.findById(tgChatId)
