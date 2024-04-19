@@ -93,7 +93,6 @@ public class BranchDao {
         );
     }
 
-    @Transactional
     public List<Branch> findAllByLinkId(Long linkId) {
         String sql = "SELECT * FROM \"Branch\" WHERE link_id = ?";
         return jdbcTemplate.query(sql, (rs, rowNum) ->
