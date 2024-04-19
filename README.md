@@ -8,7 +8,7 @@
 
 ---
 
-## Стек
+## Stack
 
 * Проект написан на `Java 21` с использованием `Spring Boot 3`
 * Приложение состоит из 2-х микросервисов: 
@@ -53,6 +53,19 @@ docker pull ghcr.io/efler/telegram-scrapper-bot/bot:latest
 
 ---
 
-## Конфигурация модулей
+## Module Configuration
 
 Вся конфигурация контейнеров происходит через `переменные окружения`, сами модули конфигурируются через `application.yml`
+
+---
+
+## Statistics
+
+Статистика проекта (плагин [Statistic](https://plugins.jetbrains.com/plugin/4509-statistic))
+![stats](project-stats/statistics.png)
+
+---
+
+_<<- Проект выполнен в рамках курса __Tinkoff Education__ ->>_
+
+_[ @Efler ]_
