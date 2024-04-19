@@ -40,7 +40,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
     private final Map<String, Long> eventIds;
 
     @Transactional
-    public boolean checkGithubUrl(Link link) {
+    protected boolean checkGithubUrl(Link link) {
         boolean updateStatus = false;
         var linkLastUpdateTime = link.getUpdatedAt();
         URI url = link.getUrl();
@@ -163,7 +163,6 @@ public class JpaLinkUpdateService implements LinkUpdateService {
     }
 
     @Override
-    @Transactional
     public int update() {
         log.debug("LinkUpdateService (JPA): Updating links...");
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
