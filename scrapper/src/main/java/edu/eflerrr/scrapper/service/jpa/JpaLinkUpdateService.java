@@ -163,6 +163,7 @@ public class JpaLinkUpdateService implements LinkUpdateService {
     }
 
     @Override
+    @Transactional
     public int update() {
         log.debug("LinkUpdateService (JPA): Updating links...");
         OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
