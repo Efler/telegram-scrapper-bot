@@ -87,7 +87,6 @@ public class JdbcLinkService implements LinkService {
     }
 
     @Override
-    @Transactional
     public List<Link> listAll(long tgChatId) {
         log.debug("LIST-ALL IN LINK-SERVICE (JDBC): tgChatId: {}", tgChatId);
         if (!chatDao.exists(
