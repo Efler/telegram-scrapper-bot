@@ -162,7 +162,6 @@ public class JdbcLinkUpdateService implements LinkUpdateService {
     }
 
     @Override
-    @Transactional
     public int update() {
         log.debug("LinkUpdateService (JDBC): Updating links...");
         var links = linkDao.findAllWithFilter(config.scheduler().forceCheckDelay(), OffsetDateTime.now());
