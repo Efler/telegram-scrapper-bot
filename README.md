@@ -63,6 +63,7 @@ docker pull ghcr.io/efler/telegram-scrapper-bot/bot:latest
 ## Statistics
 
 Статистика проекта (плагин [Statistic](https://plugins.jetbrains.com/plugin/4509-statistic))
+
 ![stats](project-stats/statistics.png)
 
 ---
