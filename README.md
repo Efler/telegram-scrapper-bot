@@ -22,6 +22,7 @@
 * В каждом модуле используется механизм `Retry (Spring)` и `Rate Limiting (Bucket4j)` для HTTP-запросов _(настройки конфигурируются)_
 * Присутствует мониторинг метрик приложения с использованием `Prometheus` и Web-UI `Grafana`
 * Github Actions настроен на автоматическую сборку образов `Docker`
+* Присутствуют unit/integration-тесты с использованием `JUnit 5` & `Testcontainers`
 
 ---
 
