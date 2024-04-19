@@ -13,13 +13,6 @@ import edu.eflerrr.scrapper.domain.jpa.entity.Link;
 import edu.eflerrr.scrapper.domain.jpa.repository.BranchRepository;
 import edu.eflerrr.scrapper.domain.jpa.repository.ChatRepository;
 import edu.eflerrr.scrapper.domain.jpa.repository.LinkRepository;
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,15 +24,20 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import static edu.eflerrr.scrapper.configuration.LinkUpdateConfig.REPOSITORY_PUSH;
 import static edu.eflerrr.scrapper.configuration.TimeConstants.MIN_DATE_TIME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @DirtiesContext
@@ -110,8 +108,9 @@ class JpaLinkUpdateServiceTest extends IntegrationTest {
 
         var link = new Link();
         link.setUrl(testGithubUrl);
+        System.out.println(MIN_DATE_TIME);
         link.setCreatedAt(staticDateTime.minusDays(2));
-        link.setCheckedAt(MIN_DATE_TIME);
+        link.setCheckedAt(staticDateTime.minusDays(2));
         link.setUpdatedAt(staticDateTime.minusDays(2));
         chat.addLink(link);
         chatRepository.saveAndFlush(chat);
