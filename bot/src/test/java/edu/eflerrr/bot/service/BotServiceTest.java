@@ -11,19 +11,17 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import edu.eflerrr.bot.command.handler.CommandHandler;
 import edu.eflerrr.bot.command.handler.impl.HelpCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.ListCommandHandler;
+import edu.eflerrr.bot.command.handler.impl.RemoveMeCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.StartCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.TrackCommandHandler;
 import edu.eflerrr.bot.command.handler.impl.UntrackCommandHandler;
 import edu.eflerrr.bot.command.list.impl.BotCommandHandlerList;
-import edu.eflerrr.bot.configuration.ApplicationConfig;
-import edu.eflerrr.bot.repository.impl.InMemoryBotRepository;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.context.ApplicationContext;
+import static edu.eflerrr.bot.message.BotMessage.GREETING;
+import static edu.eflerrr.bot.message.BotMessage.UNKNOWN_COMMAND_ERROR;
+import static edu.eflerrr.bot.message.BotMessage.WELCOME_NEW_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,34 +29,36 @@ import static org.mockito.Mockito.when;
 class BotServiceTest {
     private final BotService botService;
     private final List<CommandHandler> handlers;
-    private final HashMap<Long, List<URL>> memory;
 
     public BotServiceTest() {
-        memory = new HashMap<>();
-        var repository = new InMemoryBotRepository(memory);
-        var startCommandHandler = new StartCommandHandler(
-            repository
-        );
-        var helpCommandHandler = new HelpCommandHandler(
-            mock(ApplicationContext.class)
-        );
-        var listCommandHandler = new ListCommandHandler(
-            repository
-        );
-        var trackCommandHandler = new TrackCommandHandler(
-            repository,
-            mock(ApplicationConfig.class)
-        );
-        var untrackCommandHandler = new UntrackCommandHandler(
-            repository
-        );
+        var startCommandHandler = mock(StartCommandHandler.class);
+        when(startCommandHandler.getCommandName()).thenReturn("/start");
+        when(startCommandHandler.getCommandDescription()).thenReturn("Зарегистрировать пользователя");
+        var helpCommandHandler = mock(HelpCommandHandler.class);
+        when(helpCommandHandler.getCommandName()).thenReturn("/help");
+        when(helpCommandHandler.getCommandDescription()).thenReturn("Вывести окно с командами");
+        var listCommandHandler = mock(ListCommandHandler.class);
+        when(listCommandHandler.getCommandName()).thenReturn("/list");
+        when(listCommandHandler.getCommandDescription()).thenReturn("Вывести список отслеживаемых ссылок");
+        var trackCommandHandler = mock(TrackCommandHandler.class);
+        when(trackCommandHandler.getCommandName()).thenReturn("/track");
+        when(trackCommandHandler.getCommandDescription()).thenReturn("Начать отслеживание ссылки");
+        var untrackCommandHandler = mock(UntrackCommandHandler.class);
+        when(untrackCommandHandler.getCommandName()).thenReturn("/untrack");
+        when(untrackCommandHandler.getCommandDescription()).thenReturn("Прекратить отслеживание ссылки");
+        var removeMeCommandHandler = mock(RemoveMeCommandHandler.class);
+        when(removeMeCommandHandler.getCommandName()).thenReturn("/remove_me");
+        when(removeMeCommandHandler.getCommandDescription()).thenReturn("Удалить свой аккаунт из базы данных");
+
         handlers = List.of(
             startCommandHandler,
             helpCommandHandler,
             trackCommandHandler,
             untrackCommandHandler,
-            listCommandHandler
+            listCommandHandler,
+            removeMeCommandHandler
         );
+
         var commandHandlersList = mock(BotCommandHandlerList.class);
         when(commandHandlersList.getCommands()).thenReturn(handlers);
         botService = new BotService(mock(TelegramBot.class), commandHandlersList);
@@ -73,7 +73,8 @@ class BotServiceTest {
             new BotCommand("/help", "Вывести окно с командами"),
             new BotCommand("/track", "Начать отслеживание ссылки"),
             new BotCommand("/untrack", "Прекратить отслеживание ссылки"),
-            new BotCommand("/list", "Вывести список отслеживаемых ссылок")
+            new BotCommand("/list", "Вывести список отслеживаемых ссылок"),
+            new BotCommand("/remove_me", "Удалить свой аккаунт из базы данных")
         );
         assertThat(actualRequest)
             .usingRecursiveComparison()
@@ -83,13 +84,10 @@ class BotServiceTest {
     @Nested
     class HandleUpdateTest {
 
-        @BeforeEach
-        public void setUp() {
-            memory.clear();
-        }
-
         @Test
         public void validHandleUpdateTest() {
+            String messageText = String.format(GREETING, "TestUser") + WELCOME_NEW_USER;
+
             Update update = mock(Update.class);
             Message message = mock(Message.class);
             Chat chat = mock(Chat.class);
@@ -99,15 +97,14 @@ class BotServiceTest {
             when(chat.id()).thenReturn(1L);
             when(chat.username()).thenReturn("TestUser");
 
+            when(handlers.getFirst().handle(update)).thenReturn(messageText);
+            when(handlers.getFirst().checkFormat("/start")).thenReturn(true);
+            when(handlers.getFirst().getCommandName()).thenReturn("/start");
+
             var actualAnswer = botService.handleUpdate(update);
 
             var expectedAnswer = new SendMessage(
-                1L,
-                "Привет, *TestUser*\\!\n\n"
-                    + "Я бот для ___отслеживания обновлений_\r__ множества веб\\-ресурсов, которые тебе интересны\\!\n"
-                    + "Для получения списка доступных команд открой ___меню_\r__ или введи /help\\.\n\n"
-                    + "Ты ___успешно_\r__ зарегистрирован\\! "
-                    + "Можешь начинать отслеживать ссылки\\!"
+                1L, messageText
             )
                 .parseMode(ParseMode.MarkdownV2)
                 .disableWebPagePreview(true);
@@ -130,7 +127,10 @@ class BotServiceTest {
             var actualAnswer = botService.handleUpdate(update);
 
             var expectedAnswer = new SendMessage(
-                2L, "Прости, не могу распознать эту команду!");
+                2L, UNKNOWN_COMMAND_ERROR
+            )
+                .parseMode(ParseMode.MarkdownV2)
+                .disableWebPagePreview(true);
             assertThat(actualAnswer)
                 .usingRecursiveComparison()
                 .isEqualTo(expectedAnswer);
