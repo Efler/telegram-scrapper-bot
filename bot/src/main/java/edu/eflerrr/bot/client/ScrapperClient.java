@@ -25,11 +25,11 @@ public class ScrapperClient {
     private static final String TG_CHAT_ENDPOINT = "/tg-chat";
     private static final String LINKS_ENDPOINT = "/links";
     private final WebClient webClient;
-    private static final String trackLinkErrorMessage =
+    private static final String TRACK_LINK_ERROR_MESSAGE =
         "Error occurred during trackLink in ScrapperClient! ErrorResponse: ";
-    private static final String untrackLinkErrorMessage =
+    private static final String UNTRACK_LINK_ERROR_MESSAGE =
         "Error occurred during untrackLink in ScrapperClient! ErrorResponse: ";
-    private static final String listLinksErrorMessage =
+    private static final String LIST_LINKS_ERROR_MESSAGE =
         "Error occurred during listLinks in ScrapperClient! ErrorResponse: ";
     public final String defaultApiUrl = "http://localhost:8080";
 
@@ -104,21 +104,21 @@ public class ScrapperClient {
                         String errorMessage = errorResponse.description();
                         if (response.statusCode().value() == BAD_REQUEST.value()) {
                             return Mono.error(new InvalidDataException(
-                                trackLinkErrorMessage + errorMessage
+                                TRACK_LINK_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         if (response.statusCode().value() == CONFLICT.value()) {
                             return Mono.error(new DuplicateLinkPostException(
-                                trackLinkErrorMessage + errorMessage
+                                TRACK_LINK_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         if (response.statusCode().value() == NOT_FOUND.value()) {
                             return Mono.error(new TgChatNotExistException(
-                                trackLinkErrorMessage + errorMessage
+                                TRACK_LINK_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         return Mono.error(new RuntimeException(
-                            trackLinkErrorMessage + errorMessage
+                            TRACK_LINK_ERROR_MESSAGE + errorMessage
                         ));
                     });
             })
@@ -139,22 +139,22 @@ public class ScrapperClient {
                         String errorMessage = errorResponse.description();
                         if (response.statusCode().value() == BAD_REQUEST.value()) {
                             return Mono.error(new InvalidDataException(
-                                untrackLinkErrorMessage + errorMessage
+                                UNTRACK_LINK_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         if (response.statusCode().value() == NOT_FOUND.value()) {
                             if (errorMessage.equals("Чат не существует")) {
                                 return Mono.error(new TgChatNotExistException(
-                                    untrackLinkErrorMessage + errorMessage
+                                    UNTRACK_LINK_ERROR_MESSAGE + errorMessage
                                 ));
                             } else {
                                 return Mono.error(new LinkNotFoundException(
-                                    untrackLinkErrorMessage + errorMessage
+                                    UNTRACK_LINK_ERROR_MESSAGE + errorMessage
                                 ));
                             }
                         }
                         return Mono.error(new RuntimeException(
-                            untrackLinkErrorMessage + errorMessage
+                            UNTRACK_LINK_ERROR_MESSAGE + errorMessage
                         ));
                     });
             })
@@ -174,16 +174,16 @@ public class ScrapperClient {
                         String errorMessage = errorResponse.description();
                         if (response.statusCode().value() == BAD_REQUEST.value()) {
                             return Mono.error(new InvalidDataException(
-                                listLinksErrorMessage + errorMessage
+                                LIST_LINKS_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         if (response.statusCode().value() == NOT_FOUND.value()) {
                             return Mono.error(new TgChatNotExistException(
-                                listLinksErrorMessage + errorMessage
+                                LIST_LINKS_ERROR_MESSAGE + errorMessage
                             ));
                         }
                         return Mono.error(new RuntimeException(
-                            listLinksErrorMessage + errorMessage
+                            LIST_LINKS_ERROR_MESSAGE + errorMessage
                         ));
                     });
             })
