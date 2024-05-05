@@ -68,6 +68,4 @@ docker pull ghcr.io/efler/telegram-scrapper-bot/bot:latest
 
 ---
 
-_<<- Проект выполнен в рамках курса __Tinkoff Education__ ->>_
-
-_[ @Efler ]_
+_<<--  [ @Efler ]  -->>_
