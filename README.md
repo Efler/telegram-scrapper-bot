@@ -68,4 +68,5 @@ docker pull ghcr.io/efler/telegram-scrapper-bot/bot:latest
 
 ---
 
-_<<--  [ @Efler ]  -->>_
+
+_<<--  [ @Efler ](https://github.com/Efler)  -->>_
